@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    .stars {
+        position: relative;
+        float: left;
+        font-size: 16pt;
+        height: 1em;
+        line-height: 1em;
+    }
+
+    .stars:before {	
+        content: "\2606\2606\2606\2606\2606";
+        float: left;
+        z-index: 1;
+        color: rgb(255, 200, 0);
+    }
+
+    .stars .percent {
+        position: absolute;
+        left: 0;
+        float: left;
+        overflow: hidden;
+        z-index: -1;
+    }
+
+    .stars .percent:after {	
+        content: "\2605\2605\2605\2605\2605";
+        color: rgb(255, 200, 0);
+    }
+
+    li {
+    display: table;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+
+    .cart-plus-minus {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        height: 40px; 
+        min-height: 30px;
+        border-radius: 8px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        padding: 0 8px;
+        width: 150px;
+        
+    }
+
+    .cart-plus-minus > button {
+        width: 50%; 
+        text-align: center;
+        font-size: 24px; 
+        font-weight: 400;
+        background: none;
+        border: none;
+    }
+    .cart-plus-minus > input {
+        font-size: 20px; 
+        border-right: 1px solid rgba(0, 0, 0, 0.2);
+        border-left: 1px solid rgba(0, 0, 0, 0.2);
+        /* pointer-events: none; */
+        border-bottom: none;
+        border-top: none;
+    }
+
+    .product-price > span {
+        font-size: 25px; 
+        font-weight: 500;
+        color: #80b500;
+    }
+    .product-price > del {
+        font-size: 20px; 
+        font-weight: 500;
+        color: #b2d265;
+    }
+
+    .owl-prev, .owl-next {
+        font-size: 40px !important;
+        color: green !important;
+        margin: 5px;
+    }
+
+</style>
+
+{% endblock head %}
+
+{% block content %}
+
+<header class="bg-success py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-start text-white row g-3 align-items-center">
+            <h1 class="display-4 fw-bolder">{{ product.name|title }}</h1>
+            <span>Detalhes do produto</span>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="row my-5">
+
+        <div class="product-info col-12 col-lg-9">
+
+            <div class="row">
+
+                <div class="col-12 col-md-6">
+                    <img src="{{ product.image.url }}" alt="Imagem do produto {{ product.name }}" class="w-100">
+                </div>
+
+                <div class="col-12 col-md-6 d-flex flex-column gap-3">
+                    <div class="mt-3 mt-md-1">
+                        <h3>{{ product.name|title }}</h3>
+                        <ul class="p-0">
+                            <li>
+                                <div class="stars">
+                                    <div class="percent" style="width: {{ average_percentage }}%;"></div>
+                                </div>
+                                &nbsp;
+                                <span class="text-secondary" style="font-size: 14px;">({{ reviews.count }} reviews)</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="d-flex justify-content-start gap-3">
+                        <p class="fw-bold text-success" style="font-size: 26px;">R${{ product.price }}</p>
+                        <div>
+                            {% if product.old_price %}
+                            <p class="mb-0" style="font-size: 14px; color: #ffb800;">{{ product.get_percentage|floatformat:0 }}% Off</p>
+                            <del class="text-secondary">R${{ product.old_price }}</del>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <p class="my-3">{{ product.description }}</p>
+                    <hr>
+                    <p>Tamanho/Quantidade: <span>{{ product.stock_count }}g</span></p>
+
+                    <div class="">
+                        <p>Categoria: <a href="{% url 'category_product_list' product.category.id %}">{{ product.category|title }}</a></p>
+                    </div>
+
+                    <div class="d-flex justify-content-start gap-3">
+                        <div class="cart-plus-minus d-flex justify-content-between align-items-center gap-1 p-0">
+                            <button id="minusButton" onclick="minusPressed()">-</button>
+                            <input id="count" type="number" value="1" min="1" max="{{ product.stock_count }}" class="text-center"/>
+                            <button id="plusButton" onclick="plusPressed()">+</button>
+                        </div>
+                        <div>
+                            <!-- <a href="#" class="btn btn-success d-flex align-items-center p-2 gap-2" title="Add to Cart">
+                                <span class="text-uppercase">Adicionar à Sacola</span>
+                                <i class="bi bi-bag-fill"></i>
+                            </a> -->
+                            <button class="btn btn-success d-flex align-items-center p-2 gap-2 add-to-cart" 
+                                    type="button"
+                                    data-id="{{ product.id }}">
+                                <span class="text-uppercase">Adicionar à Sacola</span>
+                                <i class="bi bi-bag-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-3" style="font-size: 14px;">
+                        <p>Tipo: {{ product.type }}</p>
+                        <p>Tempo de vida: {{ product.life }}</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="vendor-product-info col-12 col-lg-3">
+            <div class="border rounded bg-body-tertiary p-3 mt-5 mt-lg-0">
+                <p class="fw-semibold">Vendedor</p>
+                <div class="">
+                    <p class="fw-semibold text-success">{{ vendor.user.username|title }}</p>
+                </div>
+                <hr>
+                <div class="vendor-location d-flex gap-2">
+                    <span class="text-success"><i class="bi bi-geo-alt-fill"></i></span>
+                    <p> {{ vendor_address.city }} - {{ vendor_address.state }}</p>
+                </div>
+                <div class="vendor-contact d-flex gap-2">
+                    <span class="text-success"><i class="bi bi-headset"></i></span>
+                    <p> (xx) xxxxx-xxxx</p>
+                </div>
+                <hr>
+                <div>
+                    <p style="font-size: 14px;">Seja um vendedor: <a href="{% url 'vendor_register' %}">Fazer cadastro</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-extra-info mt-5">
+
+        <div class="nav nav-tabs">
+            <a href="#description" class="nav-link active" data-bs-toggle="tab">Descrição</a>
+            <a href="#reviews" class="nav-link" data-bs-toggle="tab">Reviews</a>
+        </div>
+
+        <div class="tab-content mt-4">
+
+            <div class="tab-pane fade show active px-3" id="description">
+                <h4>Informações do produto</h4>
+                <p class="mt-3">{{ product.specifications }}</p>
+            </div>
+
+            <div class="tab-pane fade px-3" id="reviews">
+                <h4>Reviews do produto</h4>
+                <ul class="p-0 mt-3">
+                {% for review in reviews %}
+                    <li>
+                        <div class="d-flex gap-2">
+                            <span><i class="bi bi-person-circle"></i></span>
+                            <p>{{ review.user.username|title }}</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <p>
+                            {% for i in "1"|rjust:"5"|make_list %}
+                                {% if forloop.counter <= review.rating %}
+                                    <span><i class="bi bi-star-fill" style="color: #ffb800;"></i></span>
+                                {% else %}
+                                    <span><i class="bi bi-star" style="color: #ffb800;"></i></span>
+                                {% endif %}
+                            {% endfor %}
+                            </p>
+                            <p>{{ review.rating}}/5</p>
+                        </div>
+                    
+                        <p>{{ review.review }}</p>
+                    </li>
+                    <hr>
+                {% empty %}
+                    <p>Sem reviews.</p>
+                {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="category-products mt-5">
+        <h3>Produtos relacionados</h3>
+        <div class="owl-carousel owl-theme mt-4">
+            {% for pro in related_products %}
+            <div class="card mb-3" style="max-width: 540px;">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                    <img src="{{ pro.image.url }}" class="img-fluid rounded-start" alt="...">
+                    </div>
+                    <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ pro.name|title }}</h5>
+                        <div class="d-flex justify-content-start gap-3">
+                        <p class="card-text fw-bold text-success" style="font-size: 22px;">R${{ product.price }}</p>
+                        <div>
+                            {% if product.old_price %}
+                            <p class="mb-0" style="font-size: 14px; color: #ffb800;">{{ product.get_percentage|floatformat:0 }}% Off</p>
+                            <del class="text-secondary">R${{ product.old_price }}</del>
+                            {% endif %}
+                        </div>
+                    </div>
+                        <a href="{% url 'product_detail' pro.id %}" class="btn btn-success">Ver produto</a>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>  
+        
+</div>
+
+<script>
+
+    let count = document.getElementById("count");
+
+    function plusPressed() {
+        if (parseInt(count.value) < parseInt(count.max)) {
+            count.value++;
+        }
+    }
+
+    function minusPressed() {
+        if (parseInt(count.value) > parseInt(count.min)) {
+            count.value--;
+        }
+    }
+
+    // Add to cart
+    $(document).ready(function() {
+        $('.add-to-cart').click(function() {
+            var product_id = $(this).data('id');
+            var product_qty = count.value;
+
+            $.ajax({
+                url: "{% url 'add_to_cart' %}",
+                type: 'GET',
+                data: {
+                    id: product_id,
+                    quantity: product_qty,
+                },
+                dataType: 'json',
+                success: function(res) {
+                    if (res) {
+                        // $('#cart-qty').removeClass('d-none').addClass('d-block');
+                        $('#cart-qty').text(res.qty_total_products);
+                        $('#teste').text(res.qty_total_products);
+                    }
+                },
+                error: function(xhr, status, error) {
+
+                }
+            })
+            
+        })
+    })
+
+    // Owl Carousel
+    $(document).ready(function(){
+        $(".owl-carousel").owlCarousel({
+            items: 3,
+            loop: false,
+            rewind: true,
+            margin: 20,       
+            nav: true,         
+            dots: true,        
+            responsive: {
+                0: {
+                    items: 1  
+                },
+                600: {
+                    items: 2 
+                },
+                1200: {
+                    items: 3
+                }
+            }
+        });
+    });
+
+
+</script>
+{% endblock content %}

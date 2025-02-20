@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h1>Cadastro do Vendedor</h1>
+    <div class="border m-5 p-5">
+        <form action="{% url 'vendor_register' %}" method="post">
+            {% csrf_token %}
+            <fieldset>
+                {% if form.errors %}
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                            <li>{{ errors|join:', ' }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% if vendor_form.errors %}
+                    <ul>
+                        {% for field, errors in vendor_form.errors.items %}
+                            <li>{{ errors|join:', ' }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+
+                <legend>Informações da Conta</legend>
+                <div class="row">
+                   <div class="mb-3">
+                        {{ form.username }}
+                   </div>
+                   <div class="mb-3">
+                        {{ form.email }}
+                    </div>
+                   <div class="col-md-6 mb-3">
+                        {{ vendor_form.legal_name }}
+                    </div>
+                   <div class="col-md-6 mb-3">
+                        {{ vendor_form.cnpj }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        {{ form.password1 }}
+                    </div>
+                   <div class="col-md-6 mb-3">
+                        {{ form.password2 }}
+                    </div>
+                </div>
+
+            </fieldset>
+            <fieldset>
+                <legend>Endereço</legend>
+                  <div class="row">
+                        <div class="col-8 mb-3">
+                            {{ address_form.cep }}
+                        </div>
+                        <div class="col-4 mb-3">
+                            {{ address_form.state }}
+                        </div>
+                        <div class="col-8 mb-3">
+                            {{ address_form.address }}
+                        </div>
+                        <div class="col-4 mb-3">
+                            {{ address_form.number }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ address_form.district }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ address_form.city }}
+                        </div>
+                        
+                  </div>
+            </fieldset>
+            <span>
+                Já possui conta?<a href="{% url 'vendor_login' %}"> Fazer login.</a>
+            </span>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-between mt-4">
+                <a href="{% url 'home' %}" class="btn btn-secondary text-uppercase" type="button">Voltar</a>
+                <button class="btn btn-success text-uppercase" type="submit">Cadastrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        
+        function clean_form_cep() {
+            $("#address").val("");
+            $("#district").val("");
+            $("#number").val("");
+            $("#city").val("");
+            $("#state").val("");
+        }
+
+        function showAlert(message, type = 'warning') {
+            const alertHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            $('#alert-container').append(alertHTML);
+            setTimeout(() => {
+                $('.alert').alert('close');
+            }, 5000);
+        }
+
+        $("#cep").blur(function() {
+            var cep = $(this).val().replace(/\D/g, ''); 
+
+            if (cep !== "") {
+                var validacep = /^[0-9]{8}$/;
+
+                if(validacep.test(cep)) {
+                    clean_form_cep();
+
+                    $.ajax({
+                        url: "https://brasilapi.com.br/api/cep/v2/" + cep,
+                        method: "GET",
+                        dataType: "json", 
+                        timeout: 5000,
+                        success: function(json) {
+                            if (json) {
+                                if (json.street) $("#address").val(json.street);
+                                if (json.neighborhood) $("#district").val(json.neighborhood);
+                                if (json.city) $("#city").val(json.city);
+                                if (json.state) $("#state").val(json.state);
+                            } else {
+                                clean_form_cep();
+                                showAlert('CEP não encontrado.', 'warning');
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            clean_form_cep();
+                            showAlert("Erro ao buscar o CEP. Informe um CEP válido, por favor!", "danger");
+                        }
+                    });
+                } else {
+                    clean_form_cep();
+                    showAlert("Formato de CEP inválido.", 'warning');
+                }
+            } else {
+                clean_form_cep();
+            }
+        });
+
+    });
+</script>
+{% endblock content %}

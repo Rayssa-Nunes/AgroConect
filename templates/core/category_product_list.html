@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<header class="bg-success py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-start text-white row g-3 align-items-center">
+            <h1 class="display-4 fw-bolder">{{ category.name|title }}</h1>
+            <span>Total de produtos da categoria - {{ products|length }}</span>
+        </div>
+    </div>
+</header>
+<div class="container">
+    {% if products %}
+    <div class="row row-cols-2 row-cols-lg-3 row-cols-xxl-4 mt-5 row-gap-4">
+        {% for pro in products %}
+            <div class="col d-flex justify-content-center align-items-center">
+                <div class="card" style="width: 18rem;">
+                    <img src="{{ pro.image.url }}" class="card-img-top" alt="...">
+                    {% if pro.get_percentage %}
+                        <span class="badge bg-success position-absolute" style="top: 10px; right: 10px;">-{{ pro.get_percentage|floatformat:0}}%</span>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="{% url 'product_detail' pro.id %}">{{ pro.name|title }}</a></h5>
+                        <p class="card-text">{{ pro.description|truncatechars:60 }}</p>
+                        {% if pro.old_price > 0 %}
+                        <del>R${{ pro.old_price }}</del>
+                        {% else %}
+                        <span style="visibility: hidden;">-</span>
+                        {% endif %}
+                        <p class="fs-5 fw-bold text-success">R${{ pro.price }}</p>
+
+                        <!-- <a href="#" class="btn btn-success">Adicionar à Sacola</a> -->
+                        <button class="btn btn-success add-to-cart" 
+                            type="button"
+                            data-id="{{ pro.id }}"
+                            data-quantity="1">
+                            Adicionar à Sacola
+                        </button>
+                    </div>
+                  </div>
+            </div>         
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row row-cols-2 row-cols-lg-3 row-cols-xxl-4 mt-5 row-gap-4">
+        {% for pro in products_all %}
+            <div class="col d-flex justify-content-center align-items-center">
+                <div class="card" style="width: 18rem;">
+                    <div class="">
+                        <img src="{{ pro.image.url }}" class="card-img-top" alt="...">
+                        {% if pro.get_percentage %}
+                        <span class="badge bg-success position-absolute" style="top: 10px; right: 10px;">-{{ pro.get_percentage|floatformat:0}}%</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="{% url 'product_detail' pro.id %}">{{ pro.name|title }}</a></h5>
+                        <p class="card-text">{{ pro.description|truncatechars:60 }}</p>
+                        {% if pro.old_price > 0 %}
+                        <del>R${{ pro.old_price }}</del>
+                        {% else %}
+                        <span style="visibility: hidden;">-</span>
+                        {% endif %}
+                        <p class="fs-5 fw-bold text-success">R${{ pro.price|floatformat:2 }}</p>
+                      <!-- <a href="#" class="btn btn-success">Adicionar à Sacola</a> -->
+                        <button class="btn btn-success add-to-cart" 
+                            type="button"
+                            data-id="{{ pro.id }}"
+                            data-quantity="1">
+                            Adicionar à Sacola
+                        </button>
+                    </div>
+                  </div>
+            </div>         
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+
+<script>
+        // Add to cart
+        $(document).ready(function() {
+        $('.add-to-cart').click(function() {
+            var product_id = $(this).data('id');
+            var product_qty = $(this).data('quantity');
+
+            $.ajax({
+                url: "{% url 'add_to_cart' %}",
+                type: 'GET',
+                data: {
+                    id: product_id,
+                    quantity: product_qty,
+                },
+                dataType: 'json',
+                success: function(res) {
+                    if (res) {
+                        // $('#cart-qty').removeClass('d-none').addClass('d-block');
+                        $('#cart-qty').text(res.qty_total_products);
+                    }
+                },
+                error: function(xhr, status, error) {
+
+                }
+            })
+            
+        })
+    })
+</script>
+{% endblock content %}

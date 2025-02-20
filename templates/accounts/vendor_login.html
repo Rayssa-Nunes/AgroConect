@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+
+</style>
+{% endblock head %}
+
+{% block content %}
+
+<div class="container">
+    
+    <div class="border row m-5">
+        <div class="col-lg-6 p-5 d-none d-lg-block bg-success">
+            <div class="p-5 text-center text-light d-flex flex-column gap-5">
+                <div class="fw-bold fs-2 text-capitalize">
+                    Seja bem-vindo(a) ao Agroconect!
+                </div>
+                <div>
+                    <div class="fw-semibold my-3">
+                        Ainda não possui conta?
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-outline-light text-uppercase">Criar cadastro</button>
+                    </div>
+                </div>
+
+            </div>
+            
+        </div>
+
+        <div class="col-lg-6 p-1 p-lg-5">
+            <div class="p-5 text-center">
+                <form action="{% url 'vendor_login' %}" method="post">
+                    <fieldset>
+                        <legend class="mb-5 fs-2 fw-bold">Login do Vendedor</legend>
+                        {% csrf_token %}
+                        {{ form.as_p }}
+
+                        <div>
+                            <span><a href="{% url 'password_reset' %}">Esqueci a senha</a></span>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button class="btn btn-success text-uppercase" type="submit">Login</button>
+                        </div>
+                    </fieldset>
+                </form>
+                <div class="mt-4 d-block d-lg-none">
+                    <span>Ainda não possui conta? <a href="">Criar conta</a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

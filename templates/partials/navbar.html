@@ -1,0 +1,55 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">AgroConect</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'vendor_login' %}">Vendedor</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Cliente</a>
+          </li>
+          {% if request.user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'logout' %}">Sair</a>
+            </li>
+          {% endif %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Categorias
+            </a>
+            <ul class="dropdown-menu">
+              {% for category in categories %}
+              <li><a class="dropdown-item" href="{% url 'category_product_list' category.id %}">{{ category.name }}</a></li>
+              {% endfor %}
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#">Todas as categorias</a></li>
+            </ul>
+          </li>
+
+          <li>
+            <a href="{% url 'cart' %}" type="button" class="btn btn-primary position-relative" id="cart">
+              <i class="bi bi-cart-fill"></i>
+              
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" id="cart-qty">
+                {{ qty_total_products }}
+              </span>
+              
+
+            </a>
+          </li>
+        </ul>
+        <form class="d-flex" role="search" action="#">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <script>
+
+  </script>

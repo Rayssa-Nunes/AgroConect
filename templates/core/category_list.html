@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="bg-success py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-start text-white row g-3 align-items-center">
+            <h1 class="display-4 fw-bolder">Categorias</h1>
+            <span>Total de Categorias - {{ categories|length }}</span>
+        </div>
+    </div>
+</header>
+<div class="container">
+    <div class="row row-cols-2 row-cols-lg-3 row-cols-xxl-4 mt-5">
+    {% for cat in categories %}
+        <div class="col d-flex justify-content-center align-items-center">
+            <div class="card text-center mb-3" style="width: 18rem;">
+                <div class="mt-5">
+                    <img src="{{ cat.image.url }}" alt="Imagem da categoria {{ cat.name }}" style="width: 60px; height: 60px;">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ cat.name }}</h5>
+                    <a href="{% url 'category_product_list' cat.id %}" class="btn btn-success">Ver categoria</a>
+                </div>
+            </div> 
+        </div>         
+    {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}

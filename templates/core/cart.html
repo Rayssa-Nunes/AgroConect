@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+
+    .cart-plus-minus {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        height: 40px; 
+        min-height: 30px;
+        border-radius: 8px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        padding: 0 8px;
+        width: 150px;
+        
+    }
+
+    .cart-plus-minus > button {
+        width: 50%; 
+        text-align: center;
+        font-size: 24px; 
+        font-weight: 400;
+        background: none;
+        border: none;
+    }
+
+    .cart-plus-minus > input {
+        font-size: 18px; 
+        border-right: 1px solid rgba(0, 0, 0, 0.2);
+        border-left: 1px solid rgba(0, 0, 0, 0.2);
+        /* pointer-events: none; */
+        border-bottom: none;
+        border-top: none;
+        width: 60px;
+        
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<header class="bg-success py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-start text-white row g-3 align-items-center">
+            <h1 class="display-4 fw-bolder">Produtos na Sacola</h1>
+            <span style="visibility: hidden;">Total de produtos distintos na sacola - {{ products|length }}</span>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+
+    <div id="cart-items">
+        {% if products %}
+
+        <div class="row">
+            <div class="my-5 my-lg-5 col-12 col-lg-8">
+                <div class="table-responsive">
+                    <table class="table table-sm text-center">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="align-middle">Produto</th>
+                                <th scope="col" class="align-middle">Preço</th>
+                                <th scope="col" class="align-middle">Quantidade</th>
+                                <th scope="col" class="align-middle">Subtotal</th>
+                                <th scope="col" class="align-middle">Excluir</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pro in products %}
+                            <tr>
+                                <td class="align-middle">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="{{ pro.image.url }}" alt="Imagem do produto {{ pro.name }}" 
+                                            class="img-fluid" style="max-width: 60px; height: auto;">
+                                        <span class="fs-6"><a href="{% url 'product_detail' pro.id %}">{{ pro.name|title }}</a></span>
+                                    </div>
+                                </td>
+                                <td class="fs-6 align-middle">R${{ pro.price }}</td> 
+                                <td class="align-middle">
+                                    <div class="d-flex justify-content-center">
+                                        <div class="cart-plus-minus d-flex justify-content-between align-items-center gap-1 p-1">
+                                            <button id="minusButton" onclick="minusPressed('{{ pro.id }}')" class="update-qty-btn" data-id="{{ pro.id}}">-</button>
+                                            <input id="count-{{ pro.id }}" type="number" value="{{ pro.qty_in_cart }}" min="1" max="{{ pro.stock_count }}" class="text-center"/>
+                                            <button id="plusButton" onclick="plusPressed('{{ pro.id }}')" class="update-qty-btn" data-id="{{ pro.id}}">+</button>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="fs-6 align-middle" id="subtotal-{{ pro.id }}">R${{ pro.subtotal }}</td>
+                                <td class="fs-6 align-middle">
+                                    <btn type="button" class="text-success delete-btn" id="delete-btn" data-id="{{ pro.id }}">
+                                        <i class="bi bi-trash3-fill"></i>
+                                    </btn>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    
+                </div>
+
+                <!-- <p class="fs-5">Total: <span id="total">R${{ total }}</span></p> -->
+            </div>
+
+            <div class="my-0 my-lg-5 col-12 col-lg-4">
+                <div class="border rounded p-5">
+                    <div class="d-flex justify-content-between border-bottom p-2">
+                        <span class="fs-6">Subtotal:</span>
+                        <span id="total" class="fs-5 fw-bold text-success total">R${{ total }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between border-bottom p-2">
+                        <span class="fs-6">Entrega:</span>
+                        <span id="total" class="fs-6 fw-bold">Grátis</span>
+                    </div>
+                    <div class="d-flex justify-content-between border-bottom p-2">
+                        <span class="fs-6">Cupom:</span>
+                        <span id="total" class="fs-6 fw-bold text-secondary">S/C</span>
+                    </div>
+                    <div class="d-flex justify-content-between border-bottom p-2">
+                        <span class="fs-6">Total:</span>
+                        <span id="total" class="fs-5 fw-bold text-success total">R${{ total }}</span>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="{% url 'checkout' %}" class="btn btn-success" type="button">Continuar</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        {% else %}
+        <div class="m-5">
+            <p class="fs-5">Não há produtos na sacola</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function plusPressed(id) {
+        let count = document.querySelector(`#count-${id}`);
+        if (parseInt(count.value) < parseInt(count.max)) {
+            count.value = parseInt(count.value) + 1;
+        }
+    }
+
+    function minusPressed(id) {
+        let count = document.querySelector(`#count-${id}`);
+        if (parseInt(count.value) > parseInt(count.min)) {
+            count.value = parseInt(count.value) - 1;
+        }
+    }
+
+    // Update item from cart
+    $(document).ready(function() {
+        $('.update-qty-btn').click(function() {
+            var product_id = $(this).data('id');
+            var product_qty = $(`#count-${product_id}`).val();
+
+            // console.log(product_id, product_qty);
+            
+
+            $.ajax({
+                url: "{% url 'update_cart' %}",
+                type: 'GET',
+                data: {
+                    id: product_id,
+                    quantity: product_qty,
+                },
+                dataType: 'json',
+                success: function(res) {
+                    console.log(res);
+                    
+                    if (res.qty_total_products) {
+                        $('#cart-qty').text(res.qty_total_products);
+                    }; 
+                    if (res.product) {
+                        $(`#subtotal-${res.product.id}`).text(res.product.subtotal);
+                    };
+                    if (res.total) {
+                        $('.total').text(`R$${res.total}`);
+                    };
+                                 
+                },
+                error: function(xhr, status, error) {
+
+                }
+            })
+            
+        })
+    });
+
+    // Delete item from cart
+    $(".delete-btn").click(function() {
+        var product_id = $(this).data("id");
+        $.ajax({
+            url: "{% url 'delete_item_from_cart' %}",
+            type: "GET",
+            data: {
+                id: product_id,
+            },
+            success: function(response) {
+                console.log(response.total);
+                console.log(response.qty_total_products);
+                
+                $('#cart-items').html(response.data);
+                $("#cart-qty").text(response.qty_total_products);              
+            },
+            error: function(xhr, status, error) {
+                console.log("Erro: " + error);
+            }
+        });
+    });
+</script>
+{% endblock content %}

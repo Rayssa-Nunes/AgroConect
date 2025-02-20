@@ -1,0 +1,26 @@
+{% if products %}
+<div class="row row-cols-2 row-cols-lg-3 mt-5 row-gap-4">
+    {% for pro in products %}
+        <div class="col d-flex justify-content-center align-items-center">
+            <div class="card" style="width: 18rem;">
+                <img src="{{ pro.image.url }}" class="card-img-top" alt="{{ pro.name }}">
+                {% if pro.get_percentage %}
+                    <span class="badge bg-success position-absolute" style="top: 10px; right: 10px;">-{{ pro.get_percentage|floatformat:0}}%</span>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'product_detail' pro.id %}">{{ pro.name }}</a></h5>
+                    <p class="card-text">{{ pro.description|truncatechars:60 }}</p>
+                    {% if pro.old_price > 0 %}
+                    <del>R${{ pro.old_price }}</del>
+                    {% else %}
+                    <span style="visibility: hidden;">-</span>
+                    {% endif %}
+                    <p class="fs-5 fw-bold text-success">R${{ pro.price }}</p>
+
+                  <a href="#" class="btn btn-success">Adicionar à Sacola</a>
+                </div>
+              </div>
+        </div>         
+    {% endfor %}
+</div>
+{% endif %}

@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<header class="bg-success py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-start text-white row g-3 align-items-center">
+            <h1 class="display-4 fw-bolder">Checkout</h1>
+            <span style="visibility: hidden;">-</span>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="row my-5">
+
+        <div class="col-12 col-lg-4">
+            <div class="border rounded p-3 mb-4">
+                <h2>Produtos</h2>
+                <ul class="p-0">
+                    {% for pro in products %}
+                    <li class="p-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <img src="{{ pro.image.url }}" alt="" style="width: 80px; height: 80px;">
+                            <p><a href="{% url 'product_detail' pro.id %}">{{ pro.name|title }}</a></p>
+                            <p>x{{ pro.qty_in_cart }}</p>
+                            <p class="text-success fw-bold">R${{ pro.subtotal }}</p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4 mb-4">
+            {% if address %}
+                <div class="border rounded p-3">
+                    <h2>Endereço de Entrega <span class="text-success"><i class="bi bi-geo-alt-fill"></i></span></h2>
+                    <p>{{ address.address }} - {{ address.district }} - {{ address.number }}</p>
+                    <p>{{ address.city }} - {{ address.state }}</p>
+                    <p>{{ address.cep }}</p>
+
+                    <a href="" data-bs-toggle="modal" data-bs-target="#addressModal">
+                        Editar endereço
+                    </a>
+                </div>
+                
+            {% else %}
+            <div class="border rounded p-3">
+                <form action="">
+                    <fieldset>
+                        <legend>Endereço para Entrega</legend>
+                        {% csrf_token %}
+                        {{ address_form.as_p }}
+                    </fieldset>
+                </form>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="border rounded p-3">
+                <h2>Pagamento</h2>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addressModalLabel">Editar Endereço</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addressForm" action="{% url 'checkout' %}" method="post">
+                    {% csrf_token %}
+                    {{ address_form.as_p }}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="submit" class="btn btn-primary" id="save-address" form="addressForm">Salvar endereço</button>
+            </div>
+        </div>
+    </div>
+</div>
+      
+</div>
+
+
+
+
+<script>
+    $(document).ready(function() {
+        
+        function clean_form_cep() {
+            $("#address").val("");
+            $("#district").val("");
+            $("#number").val("");
+            $("#city").val("");
+            $("#state").val("");
+        }
+
+        function showAlert(message, type = 'warning') {
+            const alertHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            $('#alert-container').append(alertHTML);
+            setTimeout(() => {
+                $('.alert').alert('close');
+            }, 5000);
+        }
+
+        $("#cep").blur(function() {
+            var cep = $(this).val().replace(/\D/g, ''); 
+
+            if (cep !== "") {
+                var validacep = /^[0-9]{8}$/;
+
+                if(validacep.test(cep)) {
+                    clean_form_cep();
+
+                    $.ajax({
+                        url: "https://brasilapi.com.br/api/cep/v2/" + cep,
+                        method: "GET",
+                        dataType: "json", 
+                        timeout: 5000,
+                        success: function(json) {
+                            if (json) {
+                                if (json.street) $("#address").val(json.street);
+                                if (json.neighborhood) $("#district").val(json.neighborhood);
+                                if (json.city) $("#city").val(json.city);
+                                if (json.state) $("#state").val(json.state);
+                            } else {
+                                clean_form_cep();
+                                showAlert('CEP não encontrado.', 'warning');
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            clean_form_cep();
+                            showAlert("Erro ao buscar o CEP. Informe um CEP válido, por favor!", "danger");
+                        }
+                    });
+                } else {
+                    clean_form_cep();
+                    showAlert("Formato de CEP inválido.", 'warning');
+                }
+            } else {
+                clean_form_cep();
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock content %}

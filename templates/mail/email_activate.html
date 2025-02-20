@@ -1,0 +1,7 @@
+{% autoescape off %}
+    Oi, {{ user }}!
+    <h1>Por favor, confirme seu endereço de e-mail</h1>
+    <p>Olá, {{ user.email }}. Clique no link abaixo para ativar sua conta:</p>
+    http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+</html>
+{% endautoescape %}

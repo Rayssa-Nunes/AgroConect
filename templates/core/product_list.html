@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    .double_range_slider_box {
+      position: relative;
+      width: 100%;
+      height: 150px;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 20px;
+    }
+  
+    .double_range_slider {
+      width: 90%;
+      height: 10px;
+      position: relative;
+      background-color: #dddddd;
+      border-radius: 20px;
+    }
+  
+    .range_track {
+      height: 100%;
+      position: absolute;
+      border-radius: 20px;
+      background-color: #95d564;
+    }
+  
+    .minvalue, .maxvalue {
+      position: absolute;
+      padding: 6px 15px;
+      background: #198754;
+      border-radius: 1rem;
+      color: white;
+      font-size: 1rem;
+      transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+      will-change: transform, left, right;
+    }
+  
+    .minvalue {
+      bottom: 0;
+      transform: translate(0, -100%);
+    }
+  
+    .maxvalue {
+      top: 0;
+      transform: translate(0, 100%);
+    }
+  
+    .double_range_slider input {
+      position: absolute;
+      width: 100%;
+      height: 5px;
+      background: none;
+      pointer-events: none;
+      appearance: none;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  
+    .double_range_slider input::-webkit-slider-thumb {
+      height: 25px;
+      width: 25px;
+      border-radius: 50%;
+      border: 3px solid #cbffa3;
+      background-color: #95d564;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+  
+    .double_range_slider input::-moz-range-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      border: 3px solid #cbffa3;
+      background-color: #95d564;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+  </style>
+{% endblock head %}
+
+{% block content %}
+
+<header class="bg-success py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-start text-white row g-3 align-items-center">
+            <h1 class="display-4 fw-bolder">Produtos</h1>
+            <span>Total de produtos - {{ products|length }}</span>
+        </div>
+    </div>
+</header>
+<div class="container">
+    <div class="row">
+
+        <div class="filters order-2 order-lg-1 col-12 col-lg-3">
+            <div class="filter-category border mt-5">
+                <div class="p-4">
+                    <h4 class="fw-bold">Categorias</h4>
+                    <ul class="p-0" style="max-height: 300px; overflow-y: auto;">
+                        {% for cat in categories %}
+                        <li class="d-flex justify-content-between align-items-center p-2 gap-3 pe-3">
+
+                            <div class="d-flex gap-2">
+                                <input type="checkbox" name="checkbox" data-filter="category" class="filter-checkbox" value="{{ cat.id }}"/>
+                                <a href="{% url 'category_product_list' cat.id %}">{{ cat.name }}</a>
+                            </div>
+                            <img src="{{ cat.image.url }}" alt="" style="width: 25px">
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="filter-price border mt-4">
+                <div class="p-4">
+                    <h4 class="fw-bold">Preço</h4>
+                    <div class="double_range_slider_box">
+                        <div class="double_range_slider">
+                          <span class="range_track" id="range_track"></span>
+                      
+                          <input type="range" class="min" min="0" max="{{ min_max_price.price__max }}" value="0" step="10" />
+                          <input type="range" class="max" min="0" max="{{ min_max_price.price__max }}" value="{{ min_max_price.price__max }}" step="10" />
+                      
+                          <div class="minvalue"></div>
+                          <div class="maxvalue"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-vendor border mt-4">
+                <div class="p-4">
+                    <h4 class="fw-bold">Vendedores</h4>
+                    <ul class="p-0" style="max-height: 300px; overflow-y: auto;">
+                        {% for ven in vendors %}
+                        <li class="d-flex justify-content-between align-items-center p-2 gap-3 pe-3">
+
+                            <div class="d-flex gap-2">
+                                <input type="checkbox" name="checkbox" data-filter="vendor" class="filter-checkbox" value="{{ ven.id }}"/>
+                                <a href="">{{ ven.user.username|title }}</a>
+                            </div>
+                            <img src="{{ ven.image.url }}" alt="" style="width: 25px" class="rounded-circle">
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-list order-1 order-lg-2 col-12 col-lg-9" id="filtered-product">
+            {% if products %}
+            <div class="row row-cols-2 row-cols-lg-3 mt-5 row-gap-4">
+                {% for pro in products %}
+                    <div class="col d-flex justify-content-center align-items-center">
+                        <div class="card" style="width: 18rem;">
+                            <img src="{{ pro.image.url }}" class="card-img-top" alt="{{ pro.name }}">
+                            {% if pro.get_percentage %}
+                                <span class="badge bg-success position-absolute" style="top: 10px; right: 10px;">-{{ pro.get_percentage|floatformat:0}}%</span>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title"><a href="{% url 'product_detail' pro.id %}">{{ pro.name }}</a></h5>
+                                <p class="card-text">{{ pro.description|truncatechars:60 }}</p>
+                                {% if pro.old_price > 0 %}
+                                <del>R${{ pro.old_price }}</del>
+                                {% else %}
+                                <span style="visibility: hidden;">-</span>
+                                {% endif %}
+                                <p class="fs-5 fw-bold text-success">R${{ pro.price }}</p>
+                                <button class="btn btn-success add-to-cart" 
+                                        type="button"
+                                        data-id="{{ pro.id }}"
+                                        data-quantity="1">
+                                        Adicionar à Sacola
+                                </button>
+                            </div>
+                          </div>
+                    </div>         
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+
+    // Product filtering
+    function filter() {
+        let filter_object = {};
+    
+        let min_price = $('.min').val();
+        let max_price = $('.max').val();
+        
+        filter_object.min_price = min_price;
+        filter_object.max_price = max_price;
+        console.log("Valor de min_price:", min_price);
+
+        $('.filter-checkbox').each(function() {
+            let filter_key = $(this).data("filter");
+            let selected_values = Array.from(
+                document.querySelectorAll(`input[data-filter='${filter_key}']:checked`)
+            ).map(function(element) {
+                return element.value; 
+            });
+
+            filter_object[filter_key] = selected_values;
+        });
+        
+        $.ajax({
+            url:'/filter_product',
+            data: filter_object,
+            dataType: 'json',
+            success: function(res) {
+                $('#filtered-product').html(res.data)
+                
+            },
+            error: function(error) {
+                console.log(error);
+                
+            }
+        })
+    }
+
+    $(document).ready(function() {
+        $('.filter-checkbox').prop('checked', false);
+        
+        $('.min, .max').on('mousemove', function() {
+            filter();
+        });
+
+        
+        $('.filter-checkbox').on('click', function() {
+            filter();
+        });
+    });
+
+    $(document).ready(function() {
+        const minPrice = 0;
+        const maxPrice = '{{ min_max_price.price__max }}';
+        
+        $('.min').val(minPrice);
+        $('.max').val(maxPrice);
+
+        updateTrackAndLabels();
+
+        $('.min, .max').on('mousemove', function() {
+            filter();
+            updateTrackAndLabels();
+        });
+
+        $('.filter-checkbox').on('click', function() {
+            filter();
+        });
+
+        function updateTrackAndLabels() {
+            const minValue = parseFloat($('.min').val());
+            const maxValue = parseFloat($('.max').val());
+            const max = parseFloat($('.min').attr('max'));
+
+            const minPercent = (minValue / max) * 100;
+            const maxPercent = (maxValue / max) * 100;
+
+            // Atualiza o estilo da faixa
+            $('#range_track').css({
+                'left': `${minPercent}%`,
+                'right': `${100 - maxPercent}%`
+            });
+
+            // Atualiza os rótulos de preço
+            $('.minvalue').text(`R$${minValue.toFixed(2)}`).css('left', `${minPercent}%`);
+            $('.maxvalue').text(`R$${maxValue.toFixed(2)}`).css('right', `${100 - maxPercent}%`);
+
+            $('.minvalue').css('transform', `translate(-${minPercent / 2}%, -100%)`);
+            $('.maxvalue').css('transform', `translate(${maxPercent / 2}%, 100%)`);
+        }
+    });
+
+
+    // Add to cart
+    $(document).ready(function() {
+        $('.add-to-cart').click(function() {
+            var product_id = $(this).data('id');
+            var product_qty = $(this).data('quantity');
+
+            $.ajax({
+                url: "{% url 'add_to_cart' %}",
+                type: 'GET',
+                data: {
+                    id: product_id,
+                    quantity: product_qty,
+                },
+                dataType: 'json',
+                success: function(res) {
+                    if (res) {
+                        // $('#cart-qty').removeClass('d-none').addClass('d-block');
+                        $('#cart-qty').text(res.qty_total_products);
+                        $('#teste').text(res.qty_total_products);
+                    }
+                },
+                error: function(xhr, status, error) {
+
+                }
+            })
+            
+        })
+    })
+</script>
+{% endblock content %}
