@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.html import mark_safe
 from shortuuid.django_fields import ShortUUIDField
+from django.utils.timezone import now
 
 from accounts.models import CustomUser
 from .permissions import VENDOR_PERMISSIONS
@@ -95,7 +96,6 @@ class Address(models.Model):
         super().save(*args, **kwargs)
 
     
-
 class Category(models.Model):
     name = models.CharField('Nome', max_length=128, default='')
     image = models.ImageField('Imagem', upload_to='category', default='category.jpg')
@@ -113,12 +113,12 @@ class Category(models.Model):
 
 class Product(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, verbose_name='Categoria')
     vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True)
 
     name = models.CharField('Nome', max_length=100, default='')
     image = models.ImageField('Imagem', upload_to=user_directory_path, default='product.jpg')
-    description = models.TextField(null=True, blank=True, default='Este é um produto.')
+    description = models.TextField('Descrição', null=True, blank=True, default='Este é um produto.')
 
     price = models.DecimalField('Preço', max_digits=12, decimal_places=2, default=0)
     old_price = models.DecimalField('Preço antigo', max_digits=12, decimal_places=2, default=0)
@@ -128,7 +128,7 @@ class Product(models.Model):
     type = models.CharField('Tipo', max_length=100, default='Orgânico', null=True, blank=True)
     stock_count = models.PositiveIntegerField('Quantidade em estoque', default=0)
 
-    life = models.CharField('Tempo de vida', max_length=100, default='100 dias', null=True, blank=True)
+    life = models.CharField('Vida útil', max_length=100, default='100 dias', null=True, blank=True)
 
     product_status = models.CharField('Status', choices=STATUS, max_length=20, default='em_revisao')
 
@@ -177,7 +177,8 @@ class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, blank=True, null=True)
     address = models.ForeignKey(Address, on_delete=models.PROTECT, default=1)
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    # created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=now)
     total = models.DecimalField(max_digits=12, decimal_places=2, default='0')
 
     paid_status = models.BooleanField(default=False)

@@ -1,0 +1,146 @@
+{% extends './partials/sidebar.html' %}
+
+{% block main %}
+<main class="main-content">
+    <div class="container-fluid">
+
+        <!-- DASHBOARD -->
+        <div class="container py-5">
+            <!-- Header Section -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">Dashboard Overview</h1>
+                    <p class="text-muted small mb-0">Olá, {{ request.user.username|title }}!</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <!-- <button class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-bell me-1"></i> Notificações
+                    </button> -->
+                    <button class="btn btn-success btn-sm">
+                        <i class="fas fa-plus me-1"></i> Novo Produto
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Usuários</h6>
+                                    <h3 class="mb-0">{{ all_users }}</h3>
+                                    <!-- <small class="text-success">
+                                        <i class="fas fa-arrow-up me-1"></i>12.5%
+                                    </small> -->
+                                </div>
+                                <div class="bg-primary bg-opacity-10 p-3 rounded">
+                                    <i class="fas fa-users text-primary"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Rendimento</h6>
+                                    <h3 class="mb-0">R${{ revenue.total_revenue|floatformat:2|default:"0,00" }}</h3>
+                                    <!-- <small class="text-success">
+                                        <i class="fas fa-arrow-up me-1"></i>8.2%
+                                    </small> -->
+                                </div>
+                                <div class="bg-success bg-opacity-10 p-3 rounded">
+                                    <i class="fas fa-dollar-sign text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Pedidos</h6>
+                                    <h3 class="mb-0">{{ products_in_cart.total_quantity|default:"0" }}</h3>
+                                    <!-- <small class="text-danger">
+                                        <i class="fas fa-arrow-down me-1"></i>3.1%
+                                    </small> -->
+                                </div>
+                                <div class="bg-warning bg-opacity-10 p-3 rounded">
+                                    <i class="fas fa-shopping-cart text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-2">Ganho do Mês</h6>
+                                    <h3 class="mb-0">R${{ monthly_revenue.total_revenue|floatformat:2 }}</h3>
+                                    <!-- <small class="text-success">
+                                        <i class="fas fa-arrow-up me-1"></i>5.8%
+                                    </small> -->
+                                </div>
+                                <div class="bg-info bg-opacity-10 p-3 rounded">
+                                    <i class="fas fa-chart-line text-info"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border p-4 rounded">
+            {% if month and total_order_items%}
+                <div class="fs-5 my-5">
+                    Abaixo você pode visualizar o desempenho dos seus produtos de forma prática e intuitiva.
+                </div>
+                <div class="">
+                    <canvas id="myChart" class="w-100"></canvas>
+                </div>
+            
+            {% else %}
+
+            <p>Não há dados recentes até o momento.</p>
+            {% endif %}
+            </div>
+
+        </div>
+    </div>
+</main>
+
+
+<script>
+    const ctx = document.getElementById('myChart');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ month|safe }},
+            datasets: [{
+                label: 'Pedidos (Status - Pago)',
+                data: {{ total_order_items|safe }},
+                borderWidth: 1,
+                backgroundColor: 'rgb(59, 183, 126)',
+                borderColor: 'rgb(59, 183, 126)',
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock main %}

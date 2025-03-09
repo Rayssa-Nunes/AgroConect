@@ -7,8 +7,9 @@ from django.core.mail import EmailMessage
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
 
-from core.models import Vendor
+from core.models import Vendor, Order, Product, Category
 from core.utils import add_permission
 from core.forms import  VendorDetailsForm, AddressForm
 
@@ -17,6 +18,10 @@ from .models import CustomUser
 from .forms import RegisterForm, LoginForm
 
 from core.cart import Cart
+
+
+# from django.utils.timezone import now
+# from django.contrib.humanize.templatetags.humanize import naturaltime
 
 def activateEmail(request, user, to_email):
     mail_subject = 'Ative sua conta AgroConect.'
@@ -32,7 +37,8 @@ def activateEmail(request, user, to_email):
 
     email = EmailMessage(mail_subject, message, to=[to_email])
     if email.send():
-        messages.success(request, 'E-mail de ativação enviado com sucesso!')
+        # messages.success(request, 'E-mail de ativação enviado com sucesso!')
+        messages.success(request, 'Cadastro realizado com sucesso. Verifique seu e-mail para ativar sua conta!')
     else:
         messages.error(request, f'Problema ao tentar enviar email para {to_email}, cheque se o email informado está correto.')
 
@@ -79,7 +85,7 @@ def vendor_register_view(request):
 
             activateEmail(request, user, form.cleaned_data.get('email'))
 
-            messages.success(request, 'Cadastro realizado com sucesso. Verifique seu e-mail para ativar sua conta!')
+            # messages.success(request, 'Cadastro realizado com sucesso. Verifique seu e-mail para ativar sua conta!')
             return redirect('/')
         else:
             messages.error(request, 'Verifique os erros abaixo.')
@@ -110,6 +116,7 @@ def vendor_login_view(request):
 
             if user is not None:
                 if user.has_perm('core.view_vendor_dashboard'):
+                    print('tem permissão')
                     auth_login(request, user)
                 
                     if 'cart' in request.session:
@@ -126,14 +133,51 @@ def vendor_login_view(request):
     return render(request, 'accounts/vendor_login.html', {'form': form})
             
 
-@login_required
-def vendor_dashboard_view(request):
-    if not request.user.has_perm('core.view_vendor_dashboard'):
-        messages.error(request, 'Você não tem permissão para acessar esta página.')
-        return redirect('home')
+# @login_required
+# def vendor_dashboard_view(request):
+#     if not request.user.has_perm('core.view_vendor_dashboard'):
+#         messages.error(request, 'Você não tem permissão para acessar esta página.')
+#         return redirect('home')
     
-    # print(request.user.has_perm('core.view_vendor_dashboard'))
-    return render(request, 'accounts/vendor_dashboard.html')
+
+#     revenue = Order.objects.aggregate(total_revenue=Sum('total'))
+#     # revenue = Order.objects.filter(paid_status=True).aggregate(total_revenue=Sum('total'))
+#     total_orders_count = Order.objects.all()
+#     all_products = Product.objects.all()
+#     all_categories = Category.objects.all()
+#     new_customers = CustomUser.objects.all()  # Ainda não existe
+#     latest_orders = Order.objects.all()
+
+#     new_user_registered = CustomUser.objects.order_by('-date_joined').first()
+#     last_product_registered = Product.objects.latest('date')
+#     new_order_registered = Order.objects.order_by('-created_at').first()
+#     # if new_user_registered or last_product_registered:
+#     #     new_user_registration_time = now() - new_user_registred.date_joined
+
+#     this_month = now().month
+#     monthly_revenue = Order.objects.filter(created_at__month=this_month).aggregate(price=Sum('total'))
+
+    
+
+#     print(revenue, total_orders_count, this_month)
+#     print(monthly_revenue, new_user_registered, naturaltime(new_user_registered.date_joined))
+#     context = {
+#         'revenue': revenue,
+#         'total_orders_count': total_orders_count,
+#         'all_products': all_products,
+#         'all_categories': all_categories,
+#         'new_customers': new_customers,
+#         'latest_orders': latest_orders,
+#         'this_month': this_month,
+#         'monthly_revenue': monthly_revenue,
+#         'new_user_registered': naturaltime(new_user_registered.date_joined).replace(',', ' e'),
+#         'last_product_registered': naturaltime(last_product_registered.date).replace(',', ' e'),
+#         'new_order_registered': naturaltime(new_order_registered.created_at).replace(',', ' e'),
+#     }
+
+    
+#     # print(request.user.has_perm('core.view_vendor_dashboard'))
+#     return render(request, 'accounts/vendor_dashboard.html', context)
 
 
 def logout_user(request):

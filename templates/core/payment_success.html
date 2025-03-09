@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container my-5">
+    <div class="p-4 pb-0 pe-lg-0 pt-lg-5 align-items-center rounded-3 border shadow-lg">
+        <div class="p-3 p-lg-5 pt-lg-3 text-center">
+            <img src="{% static 'img/icons8-pago-48.png' %}" alt="icone de compra paga" style="width: 80px; height: 80px;">
+            <h3 class="display-8 fw-bold lh-1">Pagamento efetuado com sucesso.</h3>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center mb-4 mb-lg-3 mt-5">
+                <a href="/" class="btn btn-success btn-lg px-4 me-md-2"><i class="bi bi-house-door"></i> Voltar para a página inicial</a>
+            </div>
+        </div>
+        <!-- <div class="col-lg-4 offset-lg-1 p-0 overflow-hidden shadow-lg">
+            <img class="rounded-lg-3" src="bootstrap-docs.png" alt="" width="720">
+        </div> -->
+    </div>
+</div>
+
+{% endblock content %}

@@ -24,6 +24,8 @@
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css"> -->
     <!-- Link do JS Owl Carousel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    <!-- Link do Chart JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
 
     <style>
@@ -41,13 +43,39 @@
             /* color: #80b500 !important; */
         }
 
-        a.btn {
+        /* a.btn {
             color: white !important;
-        }
+        } */
 
         li {
             list-style: none;
         }
+
+        .btn-login {
+            background: linear-gradient(45deg, #16a51d, #2f729e);
+            color: white;
+            transition: background 0.3s ease-in-out;
+            border: none;
+        }
+
+        .btn-login:hover {
+            filter: brightness(0.9);
+            color: white;
+        }
+
+        .btn-outline-register {
+            border: 1px solid white;
+            color: white;
+            transition: 0.3s ease-in-out;
+        }
+
+        .btn-outline-register:hover {
+            background: white;
+            color: green;
+            border: white;
+          
+        }
+
     </style>
     
 
@@ -55,7 +83,7 @@
 
 </head>
 <body>
-    <!-- {% include 'partials/navbar.html' %} -->
+    {% include 'partials/navbar.html' %}
     <div class="container" id="alert-container">
         {% if messages %}
             {% for message in messages %}
@@ -81,7 +109,7 @@
 
     </script>
 
-    <!-- {% include 'partials/footer.html' %} -->
+    {% include 'partials/footer.html' %}
 
     <!-- Linking Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

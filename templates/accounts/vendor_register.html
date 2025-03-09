@@ -3,8 +3,9 @@
 {% block content %}
 
 <div class="container">
+    <div class="mt-5">
     <h1>Cadastro do Vendedor</h1>
-    <div class="border m-5 p-5">
+    <div class="border my-5 mx-1 mx-lg-5 py-3 px-1 p-lg-5">
         <form action="{% url 'vendor_register' %}" method="post">
             {% csrf_token %}
             <fieldset>
@@ -25,7 +26,7 @@
                 {% endif %}
 
 
-                <legend>Informações da Conta</legend>
+                <legend class="mb-4">Informações da Conta</legend>
                 <div class="row">
                    <div class="mb-3">
                         {{ form.username }}
@@ -77,12 +78,13 @@
                 Já possui conta?<a href="{% url 'vendor_login' %}"> Fazer login.</a>
             </span>
 
-            <div class="d-grid gap-2 d-md-flex justify-content-between mt-4">
+            <div class="d-grid gap-2 d-flex justify-content-between mt-4">
                 <a href="{% url 'home' %}" class="btn btn-secondary text-uppercase" type="button">Voltar</a>
                 <button class="btn btn-success text-uppercase" type="submit">Cadastrar</button>
             </div>
         </form>
     </div>
+</div>
 </div>
 
 <script>

@@ -26,7 +26,8 @@ urlpatterns = [
 
     path('', include('core.urls')),
     path('accounts/', include('accounts.urls')),
-    
+    path('useradmin/', include('useradmin.urls')),
+    path('', include('location.urls')),
 ]
 
 if settings.DEBUG:

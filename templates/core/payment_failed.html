@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    span {
+        font-size: 80px;
+    }
+</style>
+{% endblock head %}
+
+{% block content %}
+
+<!-- <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="text-center" style="margin-top: -15vh;">
+        <span>❌</span>
+        <h3>Falha ao tentar efetuar o pagamento.</h3>
+        <p>Tente novamente mais tarde.</p>
+        <a href="/" class="btn btn-success btn-lg px-4 me-md-2 fw-bold"><i class="bi bi-house-door"></i> Voltar para a
+            página inicial</a>
+    </div>
+</div> -->
+
+<div class="container my-5">
+    <div class="p-4 pb-0 pe-lg-0 pt-lg-5 align-items-center rounded-3 border shadow-lg">
+        <div class="p-3 p-lg-5 pt-lg-3 text-center">
+            <span>❌</span>
+            <h3 class="display-8 fw-bold lh-1">Falha ao tentar efetuar o pagamento.</h3>
+            <p>Tente novamente mais tarde.</p>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center mb-4 mb-lg-3 mt-5">
+                <a href="/" class="btn btn-success btn-lg px-4 me-md-2"><i class="bi bi-house-door"></i> Voltar
+                    para a página inicial</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock content %}

@@ -26,8 +26,8 @@ SECRET_KEY = 'django-insecure-4f#tt*vf843rviy6s+h4s$-7o^&y5=2i=0m4uid9@(@+35$+0e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '307d-2804-9f8-4007-1f50-1703-5f75-45e5-bb1d.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://307d-2804-9f8-4007-1f50-1703-5f75-45e5-bb1d.ngrok-free.app']
 
 # Application definition
 
@@ -42,6 +42,10 @@ INSTALLED_APPS = [
 
     'accounts',
     'core',
+    'useradmin',
+    'location',
+
+    'paypal.standard.ipn',
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
@@ -129,7 +133,7 @@ USE_TZ = True
 # STATICFILES_DIRS = (os.path.join(BASE_DIR, 'templates/static'),)
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATIC_URL = '/static/'
+STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'templates/static')
@@ -154,3 +158,9 @@ MESSAGE_TAGS = {
      constants.WARNING: 'alert-warning',
      constants.ERROR: 'alert-danger',
 }
+
+# PAYPAL SETTINGS
+PAYPAL_TEST = True
+
+PAYPAL_RECEIVER_EMAIL = 'agroconect@business.com'  # Business Sandbox Account
+PAYPAL_BUSINESS_NAME = "AgroConect"

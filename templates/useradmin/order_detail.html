@@ -1,0 +1,203 @@
+{% extends './partials/sidebar.html' %}
+{% load custom_tags %}
+
+
+{% block main %}
+
+<main class="main-content">
+
+    <div class="container py-5">
+
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0">Detalhe do Pedido</h1>
+                <p class="text-muted small mb-0">Detalhes do Pedido ID sku{{ order.id }}</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'orders' %}" class="btn btn-success btn-sm">
+                    <i class="fas fa-shopping-cart me-1"></i> Pedidos
+                </a>
+            </div>
+        </div>
+
+        <div class="row py-3 px-3 gap-4 gap-lg-0 mb-3" style="box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);">
+            <div class="mb-4 d-block d-md-flex justify-content-between">
+                <span class="text-secondary" style="font-size: .9rem;">
+                    <i class="fa-solid fa-calendar"></i>
+                    {{ order.created_at }}
+                </span>
+
+                <div style="width: 300px;" class="d-flex justify-content-center gap-2 mt-3 mt-md-0">
+
+                    <select class="form-select" name="product_status" id="status-select"
+                        aria-label="Default select example">
+                        <option selected value="">Alterar Status do Pedido</option>
+                        {% for key, value in status_choices %}
+                        <option value="{{ key }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <button type="button" class="btn btn-success" id="btn-save-status"
+                        data-id="{{ order.id }}">Salvar</button>
+                </div>
+            </div>
+            <hr class="mb-5">
+
+
+            <div class="col-12 col-lg-4 customer">
+
+                <div class="d-flex justify-content-start gap-4">
+
+                    <div class="bg-success bg-opacity-10 p-3 rounded-circle d-flex justify-content-center align-items-center"
+                        style="width: 50px; height: 50px;">
+                        <i class="fa-solid fa-user text-success"></i>
+                    </div>
+
+
+                    <div id="customer-info">
+                        <div class="fw-bold mb-3">Cliente</div>
+                        <p>{{ order.user.username|title }}</p>
+                        <p>{{ order.user.email }}</p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-12 col-lg-4 order">
+                <div class="d-flex justify-content-start gap-4">
+                    <div class="bg-success bg-opacity-10 p-3 rounded-circle d-flex justify-content-center align-items-center"
+                        style="width: 50px; height: 50px;">
+                        <i class="fa-solid fa-truck text-success"></i>
+                    </div>
+
+                    <div id="order-info">
+                        <div class="fw-bold mb-3">Informações do Pedido</div>
+                        <p>Id do pedido: sku{{ order.id }}</p>
+                        <p>Status: <span class="order-product-status">{{ order.product_status|title }}</span></p>
+                        <p>Status do pagamento: {{ order.paid_status|format_paid_status }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4 deliver">
+
+                <div class="d-flex justify-content-start gap-4">
+                    <div class="bg-success bg-opacity-10 p-3 rounded-circle d-flex justify-content-center align-items-center"
+                        style="width: 50px; height: 50px;">
+                        <i class="fa-solid fa-location-dot text-success"></i>
+                    </div>
+
+                    <div id="deliver-info">
+                        <div class="fw-bold mb-3">Entrega</div>
+                        <p>Endereço: {{ order.address.address }} - {{ order.address.number }}</p>
+                        <p>Cidade: {{ order.address.city }}</p>
+                        <p>Estado: {{ order.address.state }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row py-3 px-3 gap-4 gap-lg-0 mb-3" style="box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);">
+
+            <!-- <div class=""> -->
+
+            {% if order_items %}
+            <div class="table-responsive">
+                <table class="table table-borderless text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Produto</th>
+                            <th scope="col" class="text-nowrap">Valor Unitário</th>
+                            <th scope="col">Quantidade</th>
+                            <th scope="col">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order_items %}
+                        <tr>
+                            <th scope="row">sku{{ item.product.id }}</th>
+                            <td>
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"
+                                    style="width: 60px;">
+                                <span>{{ item.product.name|title }}</span>
+                            </td>
+                            <td>
+                                <span>R${{ item.product.price }}</span>
+                            </td>
+                            <td>
+                                <span>{{ item.quantity }}</span>
+                            </td>
+                            <td>
+                                <span>R$ {% widthratio item.quantity 1 item.product.price as total %}{{total|floatformat:2 }}</span>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
+                            <td class="text-end">R$ {{ subtotal|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-end"><strong>Valor Entrega:</strong></td>
+                            <td class="text-end">R$ {{ shipping_cost|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                            <td class="text-end"><strong>R$ {{ total|floatformat:2 }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-end"><strong>Status:</strong></td>
+                            <td class="text-end">
+                                <span
+                                    class="badge rounded-pill {% if order.paid_status %}text-bg-success{% else %}text-bg-danger{% endif %}">
+                                    {{ order.paid_status|yesno:"Pago,Pendente" }}
+                                </span>
+                            </td>
+
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            {% else %}
+            {% endif %}
+
+            <!-- </div> -->
+        </div>
+
+
+    </div>
+</main>
+
+<script>
+    $(document).ready(function () {
+        $("#btn-save-status").click(function () {
+            var status_value = $("#status-select").val();
+            var id = $(this).data("id");
+            const csrftoken = "{{ csrf_token }}";
+            console.log("Status:", status_value, "ID:", id, "csrftoken:", csrftoken);
+
+            if (status_value === "") {
+                return;
+            }
+
+            $.ajax({  // Corrigido aqui: $ajax → $.ajax
+                url: `/useradmin/order_detail/${id}/`,
+                type: "POST",
+                data: { status: status_value },
+                headers: { "X-CSRFToken": csrftoken },
+                success: function (response) {
+                    console.log("Resposta do servidor:", response);
+                    // $("#products").html(response)
+                    $(".order-product-status").text(response.status)
+                },
+                error: function (xhr, status, error) {
+                    console.error("Erro na requisição:", error);
+                }
+            });
+        });
+    })
+</script>
+{% endblock main %}

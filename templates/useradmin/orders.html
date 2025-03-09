@@ -1,0 +1,89 @@
+{% extends './partials/sidebar.html' %}
+{% load custom_tags %}
+
+{% block main %}
+
+<main class="main-content">
+
+    <div class="container py-5">
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0">Pedidos</h1>
+                <p class="text-muted small mb-0" style="visibility: hidden;">-</p>
+            </div>
+        </div>
+
+        <form method="get" action="{% url 'orders' %}" class="mb-4 d-flex gap-2">
+            <div style="width: 300px;">
+                <select class="form-select" name="paid_status" id="status-select" aria-label="Default select example">
+                    <option selected value="">Status do Pagamento</option>
+                    <option value="True">Pago</option>
+                    <option value="False">Pendente</option>
+                </select>
+            </div>
+
+            <div style="width: 300px;">
+
+                <select class="form-select" name="product_status" id="status-select" aria-label="Default select example">
+                    <option selected value="">Status da Entrega</option>
+                    {% for key, value in status_choices %}
+                    <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+
+            <button id="status-btn" class="btn btn-success" type="submit">Buscar</button>
+        </form>
+
+        <div class="border p-4 rounded">
+
+            <div class="card-body">
+                {% if orders %}
+                <div class="table-responsive">
+                    <table class="table table-hover text-center">
+                        <thead>
+                            <tr>
+                                <th>#ID</th>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Data</th>
+                                <th>Status de Entrega</th>
+                                <th>Total</th>
+                                <th>Status do Pagamento</th>
+                                <th>Ver Detalhes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>sku{{ order.id }}</td>
+                                <td>{{ order.user.username|title }}</td>
+                                <td>{{ order.user.email }}</td>
+                                <td class="text-nowrap">{{ order.created_at }}</td>
+                                <td>
+                                    <span class="{{ order.product_status|format_product_status }}">
+                                        {{ order.product_status|title }}
+                                    </span>
+                                </td>
+                                
+                                <td>R${{ order.total }}</td>
+                                <td>{{ order.paid_status|format_paid_status }}</td>
+                                <td>
+                                    <a href="{% url 'order_detail' order.id %}" class="btn btn-success">Ver detalhes</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p>Não há pedidos no carrinho. <i class="bi bi-emoji-frown"></i></p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</main>
+{% endblock main %}

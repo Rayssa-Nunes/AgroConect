@@ -11,7 +11,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'product_image', 'price', 'product_status', 'in_stock']
+    list_display = ['name', 'product_image', 'price', 'product_status', 'in_stock', 'vendor']
     list_editable = ['price', 'product_status', 'in_stock']
 
 
@@ -29,9 +29,10 @@ class AddressAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['user', 'total', 'product_status']
+    list_display = ['id', 'user', 'total', 'product_status']
+    list_editable = ['product_status']
 
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ['product', 'order_image', 'quantity']
+    list_display = ['order_id', 'product', 'order_image', 'quantity']

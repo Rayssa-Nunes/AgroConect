@@ -1,14 +1,18 @@
 from django.shortcuts import render, redirect
-from django.db.models import Q, Avg, Count
-
+from django.db.models import Q, Avg
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from django.conf import settings
 
 from . import models
-
 from .cart import Cart
 from .forms import AddressForm
+
+from paypal.standard.forms import PayPalPaymentsForm
+import uuid
+
 
 def home(request):
     return render(request, 'core/home.html')
@@ -169,6 +173,7 @@ def delete_item_from_cart(request):
 
 @login_required(redirect_field_name="vendor_login", login_url='vendor_login')
 def checkout_view(request):
+    host = request.get_host()
     if request.method == 'POST':
         form = AddressForm(request.POST)
         if form.is_valid():
@@ -190,11 +195,47 @@ def checkout_view(request):
 
         address_form = AddressForm()
 
+        item_names = ", ".join([product.name for product in products])
+        id = models.Order.objects.filter(user=request.user, paid_status=False).values_list('id', flat=True).first()
+        paypal_dict = {
+            'business': settings.PAYPAL_RECEIVER_EMAIL,
+            'amount': total,
+            'item_name': item_names,
+            'item_number': id,
+            'invoice': str(uuid.uuid4()),
+            'currency_code': 'BRL',
+            'notify_url': 'http://{}{}'.format(host, reverse('paypal-ipn')),
+            'return_url': 'http://{}{}'.format(host, reverse('payment_success')),
+            'cancel_url': 'http://{}{}'.format(host, reverse('payment_failed')),
+            'custom': 'AgroConect',
+            'no_shipping': 2, 
+            'address_override': 1,  
+            'address1': f'{address.address} - {address.number}',
+            'address2': address.district,
+            'city': address.city,  
+            'state': address.state,
+            'zip': address.cep,
+            'country_code': 'BR',
+        }
+
+        paypal_payment_button = PayPalPaymentsForm(initial=paypal_dict)
+
         context = {
             'products': products,
             'total': total,
             'address': address,
             'address_form': address_form,
+            'paypal_payment_button': paypal_payment_button,
         }
 
         return render(request, 'core/checkout.html', context)
+    
+
+# # @csrf_exempt
+def payment_success_view(request):
+    # context = request.POST
+    context = request.GET
+    return render(request, 'core/payment_success.html', {'context': context})
+
+def payment_failed_view(request):
+    return render(request, 'core/payment_failed.html')

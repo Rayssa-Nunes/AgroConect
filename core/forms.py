@@ -38,4 +38,3 @@ class AddressForm(forms.ModelForm):
     #         self.status = True
     #     super().save(*args, **kwargs)
 
-

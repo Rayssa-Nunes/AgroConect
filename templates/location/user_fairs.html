@@ -1,0 +1,235 @@
+{% extends 'useradmin/partials/sidebar.html' %}
+
+
+{% block main %}
+
+<main class="main-content">
+    <div class="container py-5">
+        <!-- {{ form.as_p }} -->
+        <!-- <div>
+            <div class="mb-5">
+                <h1 class="h3 mb-0">Adicionar Produto</h1>
+                
+            </div>
+            
+        </div> -->
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0">Feiras Cadastradas</h1>
+                <p class="text-muted small mb-0" style="visibility: hidden;">-</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'fair' %}" class="btn btn-success btn-sm">
+                    <i class="fas fa-plus me-1"></i> Nova Feira
+                </a>
+            </div>
+        </div>
+
+        <!-- 
+        <div>
+            {% for fair in user_fairs %}
+            <h3>Feira: {{ fair }}</h3>
+
+            <p><strong>Endereço:</strong> {{ fair.address }}</p>
+
+            <h4>Dias da Feira:</h4>
+            {% for day in fair.fair_days.all %}
+            <p>{{ day.day }}: {{ day.opening_time }} - {{ day.closing_time }}</p>
+            {% endfor %}
+
+            {% empty %}
+            <p>Você não está associado a nenhuma feira ainda.</p>
+            {% endfor %}
+
+        </div> -->
+
+        <div class="row">
+            {% for fair in user_fairs %}
+            <div class="col-sm-12 col-lg-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Feira #{{ fair.id }}</h5>
+                        <p class="card-text"><span class="text-success"><i class="fa-solid fa-location-dot"></i></span>
+                            {{ fair.address }}</p>
+                        <p><span class="text-success"><i class="fa-solid fa-calendar"></i></span> Dias da semana</p>
+                        <div class="">
+                            {% for day in fair.fair_days.all %}
+                            <div>{{ day.day }}: {{ day.opening_time }} - {{ day.closing_time }}</div>
+                            {% endfor %}
+                        </div>
+                        <hr>
+                        <div>
+                            <!-- <button href="#" class="btn btn-success" data-mdb-ripple-init>Editar</button> -->
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                data-bs-target="#staticBackdrop">
+                                Editar
+                            </button>
+                            <a href="{% url 'leave_fair' fair.id %}" class="btn btn-danger">
+                                Excluir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>Você não está associado a nenhuma feira ainda.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ...
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Understood</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <!-- <div class="row">
+            {% for fair in user_fairs %}
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-body m-4">
+                        <div class="">
+                            <h5 class="card-title">Feira #{{ fair.id }}</h5>
+                            <p class="card-text">{{ fair.address }}</p>
+                        </div>
+                        
+                        <div class="">
+                            <h6>Dias da Feira:</h6>
+                            <div class="d-flex flex-column"></div>
+                            {% for day in fair.fair_days.all %}
+                            
+                                <p>{{ day.day }}: {{ day.opening_time }} - {{ day.closing_time }}</p>
+                            
+                            {% endfor %}
+                        </div>
+                        </div>
+                        <hr>
+                        <div class="d-grid gap-2 d-md-block">
+                            <button class="btn btn-success" type="button">Editar</button>
+                            <button class="btn btn-danger" type="button">Excluir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>Você não está associado a nenhuma feira ainda.</p>
+            {% endfor %}
+        </div> -->
+
+
+
+        <!-- 
+        <div class="table-responsive shadow p-4 rounded">
+            <table class="table align-middle mb-0 bg-white">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Position</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://mdbootstrap.com/img/new/avatars/8.jpg" alt=""
+                                    style="width: 45px; height: 45px" class="rounded-circle" />
+                                <div class="ms-3">
+                                    <p class="fw-bold mb-1">John Doe</p>
+                                    <p class="text-muted mb-0">john.doe@gmail.com</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <p class="fw-normal mb-1">Software engineer</p>
+                            <p class="text-muted mb-0">IT department</p>
+                        </td>
+                        <td>
+                            <span class="badge badge-success rounded-pill d-inline">Active</span>
+                        </td>
+                        <td>Senior</td>
+                        <td>
+                            <button type="button" class="btn btn-link btn-sm btn-rounded">
+                                Edit
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://mdbootstrap.com/img/new/avatars/6.jpg" class="rounded-circle" alt=""
+                                    style="width: 45px; height: 45px" />
+                                <div class="ms-3">
+                                    <p class="fw-bold mb-1">Alex Ray</p>
+                                    <p class="text-muted mb-0">alex.ray@gmail.com</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <p class="fw-normal mb-1">Consultant</p>
+                            <p class="text-muted mb-0">Finance</p>
+                        </td>
+                        <td>
+                            <span class="badge badge-primary rounded-pill d-inline">Onboarding</span>
+                        </td>
+                        <td>Junior</td>
+                        <td>
+                            <button type="button" class="btn btn-link btn-rounded btn-sm fw-bold"
+                                data-mdb-ripple-color="dark">
+                                Edit
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://mdbootstrap.com/img/new/avatars/7.jpg" class="rounded-circle" alt=""
+                                    style="width: 45px; height: 45px" />
+                                <div class="ms-3">
+                                    <p class="fw-bold mb-1">Kate Hunington</p>
+                                    <p class="text-muted mb-0">kate.hunington@gmail.com</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <p class="fw-normal mb-1">Designer</p>
+                            <p class="text-muted mb-0">UI/UX</p>
+                        </td>
+                        <td>
+                            <span class="badge badge-warning rounded-pill d-inline">Awaiting</span>
+                        </td>
+                        <td>Senior</td>
+                        <td>
+                            <button type="button" class="btn btn-link btn-rounded btn-sm fw-bold"
+                                data-mdb-ripple-color="dark">
+                                Edit
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div> -->
+
+    </div>
+</main>
+
+{% endblock main %}

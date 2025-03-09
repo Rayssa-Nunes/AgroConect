@@ -31,14 +31,17 @@
           </li>
 
           <li>
-            <a href="{% url 'cart' %}" type="button" class="btn btn-primary position-relative" id="cart">
-              <i class="bi bi-cart-fill"></i>
+            <a href="{% url 'cart' %}" type="button" class="btn bg-none position-relative" id="cart">
+              <span class="text-success"><i class="bi bi-cart-fill"></i></span>
               
               <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" id="cart-qty">
                 {{ qty_total_products }}
               </span>
-              
-
+            </a>
+          </li>
+          <li>
+            <a href="" class="btn bg-none position-relative">
+              <span class="text-success"><i class="bi bi-geo-alt-fill"></i></span>
             </a>
           </li>
         </ul>

@@ -1,0 +1,199 @@
+{% extends 'useradmin/partials/sidebar.html' %}
+
+
+{% block main %}
+
+<main class="main-content">
+    <div class="container py-5">
+        <!-- {{ form.as_p }} -->
+        <!-- <div>
+            <div class="mb-5">
+                <h1 class="h3 mb-0">Adicionar Produto</h1>
+                
+            </div>
+            
+        </div> -->
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0">Adicionar Feira</h1>
+                <p class="text-muted small mb-0" style="visibility: hidden;">-</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'fair_list' %}" class="btn btn-success btn-sm">
+                    <i class="fa-solid fa-list-ul me-1"></i> Ver Feiras
+                </a>
+            </div>
+        </div>
+
+        <form action="{% url 'fair' %}" method="post" enctype="multipart/form-data" class="border-0 shadow-sm p-4">
+            {% csrf_token %}
+
+                {% if form_address.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for field, errors in form_address.errors.items %}
+                        <li><strong>{{ field }}:</strong> {{ errors }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {% if form_day.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for field, errors in form_day.errors.items %}
+                        <li><strong>{{ field }}:</strong> {{ errors }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+
+                <fieldset>
+                    <legend>Informe o endereço</legend>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label for="{{ form_address.cep.id_for_label }}">CEP</label>
+                            {{ form_address.cep }}
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label for="{{ form_address.state.id_for_label }}">Estado</label>
+                            {{ form_address.state }}
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="{{ form_address.address.id_for_label }}">Logradouro</label>
+                            {{ form_address.address }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form_address.district.id_for_label }}">Bairro</label>
+                            {{ form_address.district }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form_address.city.id_for_label }}">Cidade</label>
+                            {{ form_address.city }}
+                        </div>
+
+                        <input type="hidden" name="latitude" id="latitude" value="{{ form_address.latitude.value }}">
+                        <input type="hidden" name="longitude" id="longitude" value="{{ form_address.longitude.value }}">
+                    </div>
+
+                </fieldset>
+                <br>
+                <fieldset>
+                    <legend>Informe os dias e horários</legend>
+
+                    {% for day, label in form_day.DAYS_CHOICES %}
+                    <div class="row mb-2">
+                        <div class="col form-check">
+                            <input class="form-check-input" type="checkbox" name="day" value="{{ day }}"
+                                id="flexCheckDefault">
+                            <label class="form-check-label" for="{{ day.id_for_label }}">{{ label }}</label>
+                        </div>
+                        <div class="col">
+                            <div class="row">
+                                <input type="time" name="opening_time_{{ day }}"
+                                    class="col form-control w-auto text-center" value="00:00">
+                                <input type="time" name="closing_time_{{ day }}"
+                                    class="col form-control w-auto text-center" value="00:00">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </fieldset>
+
+                <button type="submit" class="btn btn-success mt-3">Salvar</button>
+        </form>
+    </div>
+</main>
+
+
+<script>
+
+    $(document).ready(function () {
+
+        function clean_form_cep() {
+            $("#address").val("");
+            $("#district").val("");
+            $("#city").val("");
+            $("#state").val("");
+            $("#latitude").val("");
+            $("#longitude").val("");
+        }
+
+        function showAlert(message, type = 'warning') {
+            const alertHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            $('#alert-container').append(alertHTML);
+            setTimeout(() => {
+                $('.alert').alert('close');
+            }, 5000);
+        }
+
+        $("#cep").blur(function () {
+            var cep = $(this).val().replace(/\D/g, '');
+
+            if (cep !== "") {
+                var validacep = /^[0-9]{8}$/;
+
+                if (validacep.test(cep)) {
+                    clean_form_cep();
+
+                    $.ajax({
+                        url: "https://brasilapi.com.br/api/cep/v2/" + cep,
+                        method: "GET",
+                        dataType: "json",
+                        timeout: 5000,
+                        success: function (json) {
+                            if (json) {
+                                if (json.street) $("#address").val(json.street);
+                                if (json.neighborhood) $("#district").val(json.neighborhood);
+                                if (json.city) $("#city").val(json.city);
+                                if (json.state) $("#state").val(json.state);
+
+                                if (json.location && json.location.coordinates && Object.keys(json.location.coordinates).length > 0) {
+                                    let coords = json.location.coordinates;
+                                    console.log($("#latitude").val(coords.latitude), $("#longitude").val(coords.longitude));
+
+
+                                    if (coords.latitude && coords.longitude) {
+                                        $("#latitude").val(coords.latitude);
+                                        $("#longitude").val(coords.longitude);
+                                    } else {
+                                        $("#latitude").val("");
+                                        $("#longitude").val("");
+                                    }
+                                } else {
+                                    $("#latitude").val("");
+                                    $("#longitude").val("");
+                                }
+                            } else {
+                                showAlert('CEP não encontrado.', 'warning');
+                                clean_form_cep();
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            showAlert("CEP não encontrado", 'danger');
+                            clean_form_cep();
+
+                            // showAlert(`Erro ao buscar o CEP: ${textStatus}`, 'danger');
+                        }
+                    });
+                } else {
+                    showAlert("Formato de CEP inválido.", 'warning');
+                    clean_form_cep();
+                }
+            } else {
+                clean_form_cep();
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock main %}

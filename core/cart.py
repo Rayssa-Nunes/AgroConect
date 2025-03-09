@@ -139,8 +139,11 @@ class Cart:
 
 
     def _save_cart_to_db(self):
+        if not self.cart:
+            return 
         order, _ = Order.objects.get_or_create(user=self.request.user)
         for product_id, data in self.cart.items():
+            print(data)
             product = Product.objects.get(id=int(product_id))
             item, created = OrderItem.objects.get_or_create(
                 order=order, 
