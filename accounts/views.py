@@ -131,53 +131,6 @@ def vendor_login_view(request):
     else:
         form = LoginForm()
     return render(request, 'accounts/vendor_login.html', {'form': form})
-            
-
-# @login_required
-# def vendor_dashboard_view(request):
-#     if not request.user.has_perm('core.view_vendor_dashboard'):
-#         messages.error(request, 'Você não tem permissão para acessar esta página.')
-#         return redirect('home')
-    
-
-#     revenue = Order.objects.aggregate(total_revenue=Sum('total'))
-#     # revenue = Order.objects.filter(paid_status=True).aggregate(total_revenue=Sum('total'))
-#     total_orders_count = Order.objects.all()
-#     all_products = Product.objects.all()
-#     all_categories = Category.objects.all()
-#     new_customers = CustomUser.objects.all()  # Ainda não existe
-#     latest_orders = Order.objects.all()
-
-#     new_user_registered = CustomUser.objects.order_by('-date_joined').first()
-#     last_product_registered = Product.objects.latest('date')
-#     new_order_registered = Order.objects.order_by('-created_at').first()
-#     # if new_user_registered or last_product_registered:
-#     #     new_user_registration_time = now() - new_user_registred.date_joined
-
-#     this_month = now().month
-#     monthly_revenue = Order.objects.filter(created_at__month=this_month).aggregate(price=Sum('total'))
-
-    
-
-#     print(revenue, total_orders_count, this_month)
-#     print(monthly_revenue, new_user_registered, naturaltime(new_user_registered.date_joined))
-#     context = {
-#         'revenue': revenue,
-#         'total_orders_count': total_orders_count,
-#         'all_products': all_products,
-#         'all_categories': all_categories,
-#         'new_customers': new_customers,
-#         'latest_orders': latest_orders,
-#         'this_month': this_month,
-#         'monthly_revenue': monthly_revenue,
-#         'new_user_registered': naturaltime(new_user_registered.date_joined).replace(',', ' e'),
-#         'last_product_registered': naturaltime(last_product_registered.date).replace(',', ' e'),
-#         'new_order_registered': naturaltime(new_order_registered.created_at).replace(',', ' e'),
-#     }
-
-    
-#     # print(request.user.has_perm('core.view_vendor_dashboard'))
-#     return render(request, 'accounts/vendor_dashboard.html', context)
 
 
 def logout_user(request):

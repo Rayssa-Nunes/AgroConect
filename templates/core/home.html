@@ -1,8 +1,272 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<style>
+    .nav-underline .nav-link {
+  color: black; 
+}
+
+.nav-underline .nav-link.active {
+  color: green; 
+  font-weight: 700; 
+  border-bottom-color: green;
+}
+
+.image-container {
+    width: 100%;   
+    height: 600px; 
+    overflow: hidden; 
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
 
+</style>
+{% endblock head %}
 {% block content %}
 <!-- {% include 'partials/navbar.html' %} -->
-<h1>Home</h1>
+
+
+  <div class="image-container">
+    <img src="{% static 'img/back3.jpg' %}" alt="Imagem" class="image">
+</div>
+
+
+  <div class="container">
+
+    <section class=" text-center" id="categories" style="margin: 80px 0px 80px 0px;">
+        <div class="display-6 fw-bold">Categorias</div>
+        <div class="my-5 d-flex justify-content-around align-items-center text-center">
+        {% for cat in categories %}
+        <div class="my-5">
+            <a href="{% url 'category_product_list' cat.id %}">
+                <div class="border rounded-circle d-flex justify-content-center align-items-center" style="width: 8rem; height: 8rem;">
+                    <img src="{{ cat.image.url }}" alt="Imagem da categoria {{ cat.name }}" style="width: 60px; height: 60px;">
+                </div>
+                <h5 class="mt-3 text-success">{{ cat.name|title }}</h5>
+            </a>
+        </div>
+        {% endfor %}
+        </div>
+    </section>
+
+    <section class="my-5 text-center" id="products" style="margin: 80px 0px 80px 0px;">
+        <div class="display-6 fw-bold">Produtos</div>
+        <div class="my-5">
+            <div class="nav nav-underline d-flex justify-content-around" id="tabs">
+                <a href="#frutas" class="nav-link active" data-bs-toggle="tab">Frutas</a>
+                <div class="vr"></div>
+                <a href="#verduras" class="nav-link" data-bs-toggle="tab">Verduras</a>
+                <div class="vr"></div>
+                <a href="#temperos" class="nav-link" data-bs-toggle="tab">Temperos</a>
+                <div class="vr"></div>
+                <a href="#raizes" class="nav-link" data-bs-toggle="tab">Raízes</a>
+                <div class="vr"></div>
+                <a href="#mel" class="nav-link" data-bs-toggle="tab">Mel</a>
+                <div class="vr"></div>
+                <a href="#graos" class="nav-link" data-bs-toggle="tab">Grãos</a>
+            </div>
+            
+            <div class="tab-content mt-4">
+                <div class="tab-pane fade show active" id="frutas">
+
+                    <!-- Products -->
+                    <div class="row row-cols-md-2 row-cols-lg-3 row-cols-xxl-4 mt-5 row-gap-4">
+                    {% for pro in products_all %}
+                        {% if pro.category.id == 1 %}
+
+                        <div class="col d-flex justify-content-center align-items-center">
+                            <div class="card" style="width: 18rem;">
+                                <img src="{{ pro.image.url }}" class="card-img-top" alt="...">
+                                {% if pro.get_percentage %}
+                                    <span class="badge bg-success position-absolute" style="top: 10px; right: 10px;">-{{ pro.get_percentage|floatformat:0}}%</span>
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title"><a href="{% url 'product_detail' pro.id %}">{{ pro.name|title }}</a></h5>
+                                    <p class="card-text">{{ pro.description|truncatechars:60 }}</p>
+                                    {% if pro.old_price > 0 %}
+                                    <del>R${{ pro.old_price }}</del>
+                                    {% else %}
+                                    <span style="visibility: hidden;">-</span>
+                                    {% endif %}
+                                    <p class="fs-5 fw-bold text-success">R${{ pro.price }}</p>
+            
+                                    <!-- <a href="#" class="btn btn-success">Adicionar à Sacola</a> -->
+                                    <button class="btn btn-success add-to-cart" 
+                                        type="button"
+                                        data-id="{{ pro.id }}"
+                                        data-quantity="1">
+                                        Adicionar à Sacola
+                                    </button>
+                                </div>
+                              </div>
+                        </div>  
+
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="verduras">
+                    
+
+                <!-- Products -->
+                <div class="row row-cols-md-2 row-cols-lg-3 row-cols-xxl-4 mt-5 row-gap-4">
+                    {% for pro in products_all %}
+                        {% if pro.category.id == 2 %}
+
+                        <div class="col d-flex justify-content-center align-items-center">
+                            <div class="card" style="width: 18rem;">
+                                <img src="{{ pro.image.url }}" class="card-img-top" alt="...">
+                                {% if pro.get_percentage %}
+                                    <span class="badge bg-success position-absolute" style="top: 10px; right: 10px;">-{{ pro.get_percentage|floatformat:0}}%</span>
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title"><a href="{% url 'product_detail' pro.id %}">{{ pro.name|title }}</a></h5>
+                                    <p class="card-text">{{ pro.description|truncatechars:60 }}</p>
+                                    {% if pro.old_price > 0 %}
+                                    <del>R${{ pro.old_price }}</del>
+                                    {% else %}
+                                    <span style="visibility: hidden;">-</span>
+                                    {% endif %}
+                                    <p class="fs-5 fw-bold text-success">R${{ pro.price }}</p>
+            
+                                    <!-- <a href="#" class="btn btn-success">Adicionar à Sacola</a> -->
+                                    <button class="btn btn-success add-to-cart" 
+                                        type="button"
+                                        data-id="{{ pro.id }}"
+                                        data-quantity="1">
+                                        Adicionar à Sacola
+                                    </button>
+                                </div>
+                                </div>
+                        </div>  
+
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+
+
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- <section class="my-5 text-center" id="fairs" style="margin: 80px 0px 80px 0px;">
+        <div>
+            <div class="display-6 fw-bold">Feiras</div>
+            <div class="owl-carousel owl-theme my-5">
+                {% for fair in all_fairs %}
+                <div class="shadow p-4 rounded text-center mb-3" style="width: 18rem;">
+                    <div class="card-body">
+                    <span class="card-title"><i class="bi bi-shop text-success display-6"></i></span>
+                    <p class="card-text mt-3">{{ fair }}</p>
+                    <a href="#" class="btn btn-outline-success">Ver feira</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    
+    <section class="my-5 text-center" id="vendors" style="margin: 80px 0px 80px 0px;">
+        <div class="display-6 fw-bold">Vendedores</div>
+        <div>
+            <div class="owl-carousel owl-theme my-5">
+                {% for vendor in vendors %}
+                <div class="shadow p-4 rounded text-center mb-3" style="width: 18rem;">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <img src="{{ vendor.image.url }}" alt="" class="rounded-circle" style="width: 60px; height: 60px;">
+                    
+                    <h5 class="card-text mt-3 fw-bold">{{ vendor.user.username|title }}</h5>
+                    <a href="#" class="btn btn-outline-success">Ver detalhes</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section> -->
+
+</div>
+
+
+
+<div class="position-relative">
+
+    <div class="position-absolute bottom-0 start-0 w-100" style="height: 80%; z-index: 0; background: #ecebe9;"></div>
+        <div class="container">
+            <section class="my-5 text-center position-relative" id="fairs" style="margin: 80px 0px 80px 0px; z-index: 1;">
+                <div>
+                    <div class="display-6 fw-bold">Feiras</div>
+                    <div class="owl-carousel owl-theme my-5">
+                        {% for fair in all_fairs %}
+                        <div class="shadow p-4 rounded text-center mb-3 position-relative" style="width: 18rem; background-color: white; z-index: 2;">
+                            <div class="card-body">
+                                <span class="card-title"><i class="bi bi-shop text-success display-6"></i></span>
+                                <p class="card-text">{{ fair }}</p>
+                                <a href="#" class="btn btn-outline-success">Ver feira</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <section class="my-5 text-center position-relative" id="fairs" style="margin: 80px 0px 80px 0px; z-index: 1;">
+                <div>
+                    <div class="display-6 fw-bold">Vendedores</div>
+                    <div class="owl-carousel owl-theme my-5">
+                        {% for vendor in vendors %}
+                        <div class="shadow p-4 rounded text-center mb-3" style="width: 18rem; background-color: white; z-index: 2;">
+                            <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                                <img src="{{ vendor.image.url }}" alt="" class="rounded-circle" style="width: 60px; height: 60px;">
+                            
+                            <h5 class="card-text mt-3 fw-bold">{{ vendor.user.username|title }}</h5>
+                            <p>{{ vendor.description }}</p>
+                            <a href="#" class="btn btn-outline-success">Ver detalhes</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+</div>
+
+<script>
+        // Owl Carousel
+        $(document).ready(function(){
+        $(".owl-carousel").owlCarousel({
+            items: 4,
+            loop: false,
+            rewind: true,
+            margin: 20,       
+            nav: true,         
+            dots: true,        
+            responsive: {
+                0: {
+                    items: 2
+                },
+                770: {
+                    items: 2  
+                },
+                1000: {
+                    items: 3 
+                },
+                1400: {
+                    items: 4
+                }
+            }
+        });
+    });
+</script>
 
 {% endblock content %}

@@ -1,58 +1,34 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">AgroConect</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'vendor_login' %}">Vendedor</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Cliente</a>
-          </li>
-          {% if request.user.is_authenticated %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'logout' %}">Sair</a>
-            </li>
-          {% endif %}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Categorias
-            </a>
-            <ul class="dropdown-menu">
-              {% for category in categories %}
-              <li><a class="dropdown-item" href="{% url 'category_product_list' category.id %}">{{ category.name }}</a></li>
-              {% endfor %}
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">Todas as categorias</a></li>
-            </ul>
-          </li>
 
-          <li>
-            <a href="{% url 'cart' %}" type="button" class="btn bg-none position-relative" id="cart">
-              <span class="text-success"><i class="bi bi-cart-fill"></i></span>
-              
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" id="cart-qty">
-                {{ qty_total_products }}
-              </span>
-            </a>
-          </li>
-          <li>
-            <a href="" class="btn bg-none position-relative">
-              <span class="text-success"><i class="bi bi-geo-alt-fill"></i></span>
-            </a>
-          </li>
-        </ul>
-        <form class="d-flex" role="search" action="#">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="q">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
+{% load static %}
+
+  <div class="container-fluid position-fixed z-2">
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom shadow bg-light">
+      <div class="col-md-3 mb-2 mb-md-0">
+        <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
+          <img src="{% static 'img/AGRO4.png' %}" alt="" style="width: 200px;">
+            
+          <!-- <svg class="bi" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"/></svg> -->
+        </a>
       </div>
-    </div>
-  </nav>
 
+      <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+        <li><a href="#" class="nav-link px-2 link-secondary">Home</a></li>
+        <li><a href="#" class="nav-link px-2">Features</a></li>
+        <li><a href="#" class="nav-link px-2">Pricing</a></li>
+        <li><a href="#" class="nav-link px-2">FAQs</a></li>
+        <li><a href="#" class="nav-link px-2">About</a></li>
+      </ul>
+
+      <div class="col-md-3 text-end">
+        <button type="button" class="btn btn-outline-primary me-2">Login</button>
+        <button type="button" class="btn btn-primary">Sign-up</button>
+      </div>
+    </header>
+  </div>
+
+
+
+  
   <script>
 
   </script>

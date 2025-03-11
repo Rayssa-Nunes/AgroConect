@@ -1,11 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
-from .models import Fair, FairDay
-from .forms import FairDayForm, FairAddressForm
+from django.http import JsonResponse
 
 from geopy.geocoders import Nominatim
+import folium
+
+from .models import Fair, FairDay, FairAddress
+from .forms import FairDayForm, FairAddressForm
+from .location import Location
+
 
 @login_required
 def fair_view(request):
@@ -90,3 +94,102 @@ def leave_fair(request, id):
 
     return redirect('fair_list')
 
+
+
+coordinates = [
+    {'gramado': {'latitude': '-29.386051225274144', 'longitude': '-50.89690380192829'}},
+    {'arara': {'latitude': '-6.845475646209959', 'longitude': '-35.7725301195203'}},
+    {'bananeiras': {'latitude': '-6.7537682', 'longitude': '-35.6338343'}},
+    {'solanea': {'latitude': '-6.7540351', 'longitude': '-35.6621943'}}
+]
+
+
+# def map_view(request):
+#     loc = Location()
+#     coords = loc.get_distinct_cep_locations()
+
+#     mapa = folium.Map(location=[coords[0]['latitude'], coords[0]['longitude']], zoom_start=7)
+
+#     if request.method == 'POST':
+#         cep = request.POST.get('cep')
+#         if cep:
+#             coord = loc.get_location(cep)
+
+#             if coord:
+#                 distances = loc.calculate_distance(coord, coords)
+#                 location = (float(coord['latitude']), float(coord['longitude']))
+#                 mapa = folium.Map(location=location)
+
+#                 folium.Marker(location=location, popup=coord['city'], icon=folium.Icon(color='red')).add_to(mapa)
+                
+#                 for dist in distances:
+#                     for cep, distance_value in dist.items():
+#                         cep_coords = next((item for item in coords if item['cep'] == cep), None)
+#                         if cep_coords:
+#                             cep_location = (float(cep_coords['latitude']), float(cep_coords['longitude']))
+#                             folium.Marker(location=cep_location, popup=f'{cep}: {distance_value:.2f} km').add_to(mapa)
+
+#                 ceps = [item['cep'] for item in coords]
+#                 fairs = Fair.objects.filter(address__cep__in=ceps)
+#     else:
+    
+#         for location in coords:
+#             folium.Marker(
+#                 location=[location['latitude'], location['longitude']],
+#                 popup=f"Cidade: {location['city']}, CEP: {location['cep']}"
+#             ).add_to(mapa)
+
+#     mapa_html = mapa._repr_html_()
+
+#     context = {
+#         'locations': coords,
+#         'mapa_html': mapa_html,
+#         'fairs': fairs if request.method == 'POST' and cep else None,
+#     }
+#     return render(request, 'location/map.html', context)
+
+def map_view(request):
+    loc = Location()
+    coords = loc.get_distinct_cep_locations()
+
+    mapa_html = None
+    distances = None
+    fairs = None
+
+    cep = request.GET.get('cep')
+    if cep:
+        coord = loc.get_location(cep)
+        if coord:
+            distances = loc.calculate_distance(coord, coords)
+            location = (float(coord['latitude']), float(coord['longitude']))
+            mapa = folium.Map(location=location)
+
+            folium.Marker(location=location, popup=coord['city'], icon=folium.Icon(color='red')).add_to(mapa)
+            
+            for dist in distances:
+                for cep, distance_value in dist.items():
+                    cep_coords = next((item for item in coords if item['cep'] == cep), None)
+                    if cep_coords:
+                        cep_location = (float(cep_coords['latitude']), float(cep_coords['longitude']))
+                        folium.Marker(location=cep_location, popup=f'{cep}: {distance_value:.2f} km').add_to(mapa)
+
+            ceps = [item['cep'] for item in coords]
+            fairs = Fair.objects.filter(address__cep__in=ceps)
+            mapa_html = mapa._repr_html_()
+    else:
+        mapa = folium.Map(location=[coords[0]['latitude'], coords[0]['longitude']], zoom_start=7)
+        for location in coords:
+            folium.Marker(
+                location=[location['latitude'], location['longitude']],
+                popup=f"Cidade: {location['city']}, CEP: {location['cep']}"
+            ).add_to(mapa)
+
+        mapa_html = mapa._repr_html_()
+
+    context = {
+        'locations': coords,
+        'mapa_html': mapa_html,
+        'fairs': fairs,
+        'distances': distances,
+    }
+    return render(request, 'location/map.html', context)

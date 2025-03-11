@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load custom_tags_location %}
+
+{% block head %}
+
+
+{% endblock head %}
+
+{% block content %}
+
+<div class="container">
+    <div class="my-5">
+        <div class="my-3 shadow rounded p-4">
+            <div class="fs-4 fw-bold my-3">
+                Encontre as feiras mais próximas.
+            </div>
+            <form action="{% url 'map' %}" method="get" class="d-flex gap-2">
+                {% csrf_token %}
+                <input type="text" class="form-control" placeholder="CEP" style="max-width: 300px;" name="cep">
+                <button type="submit" class="btn btn-success">Buscar</button>
+            </form>
+        </div>
+
+        <div class="row">
+            {% if fairs %}
+            <div class="col-lg-4">
+                {% for fair in fairs %}
+
+                <div class="mb-3 shadow p-3 rounded">
+                    <!-- <div class="card-header text-success fw-bold">
+                      {{ fair.address.city|title}}
+                    </div> -->
+                    <div class="card-body">
+                      <h5 class="card-title fw-bold"> {{ fair.address.city|title}} - Feira</h5>
+                      <hr>
+
+                        <!-- {{ distances }} -->
+                        {% with distance=distances|get_item:fair.address.cep %}
+                            {% if distance is not None %}
+                                <p class="card-text">{{ distance|floatformat:3 }} km <span class="card-text text-secondary">{{ fair.address.address }} - {{ fair.address.district }} - {{ fair.address.state }}</span></p>
+                            {% endif %}
+                        {% endwith %}
+
+                        <!-- <div class="badge ounded-pill text-bg-info">Visualize os vendedores cadastrados nesta feira.</div> -->
+                        <div class="mt-3">
+                            <a href="#" class="btn btn-outline-success"><i class="bi bi-shop text-success"></i> Ver mais</a>
+                        </div>
+                      
+                    </div>
+                  </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+          
+            <div id="map" {% if fairs %} class="shadow p-2 rounded col-lg-8" {% else %} class="shadow p-2 rounded" {% endif %}>
+                {{ mapa_html|safe }}
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+
+{% endblock content %}
