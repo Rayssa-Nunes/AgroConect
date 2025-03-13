@@ -1,4 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'base2.html' %}
+
+{% load static %}
 
 {% block head %}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
@@ -179,7 +181,8 @@
         </button>
 
         <div class="p-4">
-            <h4 class="logo-text fw-bold mb-0">AgroConect</h4>
+            <!-- <h4 class="logo-text fw-bold mb-0">AgroConect</h4> -->
+            <img src="{% static 'img/AGRO4.png' %}" alt="" style="width: 200px;" id="logo-agro" class="hide-on-collapse">
             <p class="text-muted small hide-on-collapse">Dashboard</p>
         </div>
 
@@ -188,14 +191,6 @@
                 <i class="fas fa-home me-3"></i>
                 <span class="hide-on-collapse">Dashboard</span>
             </a>
-            <!-- <a href="#" class="sidebar-link text-decoration-none p-3 d-flex justify-content-start">
-                <i class="fas fa-chart-bar me-3"></i>
-                <span class="hide-on-collapse">Analytics</span>
-            </a> -->
-            <!-- <a href="" class="sidebar-link text-decoration-none p-3 d-flex justify-content-start">
-                <i class="fas fa-users me-3"></i>
-                <span class="hide-on-collapse">Clientes</span>
-            </a> -->
 
             <a href="{% url 'orders' %}" class="sidebar-link text-decoration-none p-3 d-flex justify-content-start">
                 <i class="fas fa-shopping-cart me-3"></i>
@@ -211,7 +206,7 @@
                 <span class="hide-on-collapse">Add produto</span>
             </a>
 
-            <a href="{% url 'fair_list' %}" class="sidebar-link text-decoration-none p-3 d-flex justify-content-start">
+            <a href="{% url 'my_fair_list' %}" class="sidebar-link text-decoration-none p-3 d-flex justify-content-start">
                 <i class="fa-solid fa-store me-3"></i>
                 <span class="hide-on-collapse">Feiras</span>
             </a>
@@ -243,9 +238,20 @@
                 <a href="#"
                     class="d-flex flex-column align-items-center text-white text-decoration-none dropdown-toggle gap-2"
                     id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" class="rounded-circle">
+                    <!-- <img src="https://github.com/mdo.png" alt="hugenerd" width="30" height="30" class="rounded-circle"> -->
+
+                    {% with request.user.vendor.first as vendor %}
+                    {% if vendor and vendor.image %}
+                        <img src="{{ vendor.image.url }}" alt="Imagem do vendedor" width="30" height="30" class="rounded-circle">
+                    {% else %}
+                        <img src="{% static 'img/default-profile.png' %}" alt="Imagem padrão" width="30" height="30" class="rounded-circle">
+                    {% endif %}
+                {% endwith %}
                     <span class="d-none d-sm-inline mx-1">{{ request.user.username|title }}</span>
                 </a>
+
+
+
                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
                     <li><a class="dropdown-item" href="#">New project...</a></li>
                     <li><a class="dropdown-item" href="#">Settings</a></li>

@@ -1,8 +1,8 @@
 
 {% load static %}
 
-  <div class="container-fluid position-fixed z-2">
-    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom shadow bg-light">
+  <div class="container-fluid top-0 position-relative z-2">
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-2 mb-0 border-bottom shadow bg-light rounded px-2">
       <div class="col-md-3 mb-2 mb-md-0">
         <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
           <img src="{% static 'img/AGRO4.png' %}" alt="" style="width: 200px;">
@@ -12,23 +12,61 @@
       </div>
 
       <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-        <li><a href="#" class="nav-link px-2 link-secondary">Home</a></li>
-        <li><a href="#" class="nav-link px-2">Features</a></li>
-        <li><a href="#" class="nav-link px-2">Pricing</a></li>
-        <li><a href="#" class="nav-link px-2">FAQs</a></li>
-        <li><a href="#" class="nav-link px-2">About</a></li>
+        <li><a href="{% url 'home' %}" class="nav-link px-2 link-secondary">Home</a></li>
+        <li><a href="{% url 'product_list' %}" class="nav-link px-2">Produtos</a></li>
+        <!-- <li><a href="#" class="nav-link px-2">Feiras</a></li> -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Categorias
+          </a>
+          <ul class="dropdown-menu">
+            {% for cat in categories %}
+            <li><a class="dropdown-item" href="{% url 'category_product_list' cat.id %}">{{ cat.name|title }}</a></li>
+            {% endfor %}
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'category_list' %}">Todas</a></li>
+          </ul>
+        </li>
+        <li><a href="{% url 'vendor_list' %}" class="nav-link px-2">Feirantes</a></li>
       </ul>
 
-      <div class="col-md-3 text-end">
-        <button type="button" class="btn btn-outline-primary me-2">Login</button>
-        <button type="button" class="btn btn-primary">Sign-up</button>
+      <div class="col-md-3 text-end d-flex justify-content-end gap-2">
+        <a href="{% url 'map' %}" class="btn bg-none text-success border border-success">
+          <i class="bi bi-shop fs-4"></i>
+        </a>
+        {% if not request.user.is_authenticated %}
+        <div class="dropdown">
+          <button class="btn bg-none text-success border border-success nv-link" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person fs-4"></i>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="{% url 'vendor_register' %}">Cadastrar Vendedor</a></li>
+            <li><a class="dropdown-item" href="{% url 'vendor_login' %}">Logar Vendedor</a></li>
+            <li><a class="dropdown-item" href="{% url 'customer_register' %}">Cadastrar Cliente</a></li>
+            <li><a class="dropdown-item" href="{% url 'customer_login' %}">Logar Cliente</a></li>
+          </ul>
+        </div>
+        {% endif %}
+        
+        <a href="{% url 'cart' %}" class="btn bg-none text-success border border-success position-relative">
+          <i class="bi bi-cart3 fs-4"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" id="cart-qty">
+            {{ qty_total_products }}
+          </span>
+        </a>
+        {% if request.user.is_authenticated %}
+        <button class="btn bg-none border-success p-3 text-success" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><i class="bi bi-list"></i></button>
+
+        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasRightLabel">Informações do Usuário</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <a href="{% url 'logout' %}" class="btn btn-success">Sair</a>
+          </div>
+        </div>
+        {% endif %}
       </div>
     </header>
   </div>
-
-
-
-  
-  <script>
-
-  </script>

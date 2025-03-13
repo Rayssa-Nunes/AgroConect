@@ -6,9 +6,6 @@ from geopy.geocoders import Nominatim
 from .models import FairAddress
 
 class Location:
-    # def __init__(self):
-        # self.request = request
-
     
     def extract_coordinates(self, json):
         if 'location' in json and 'coordinates' in json['location']:

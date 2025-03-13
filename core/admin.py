@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Vendor, Category, Product, ProductReview, Address, Order, OrderItem
+from .models import Vendor, Category, Product, ProductReview, Address, Order, OrderItem, Customer
 
 admin.site.register(Vendor)
 
@@ -36,3 +36,8 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ['order_id', 'product', 'order_image', 'quantity']
+
+
+@admin.register(Customer)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = ['customer_image', 'user', 'cpf']

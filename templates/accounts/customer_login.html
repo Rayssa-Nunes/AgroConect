@@ -1,12 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block content %}
-
 <header class="bg-success py-5">
   <div class="container px-4 px-lg-5 my-5">
       <div class="text-start text-white row g-3 align-items-center">
-          <h1 class="display-4 fw-bolder">Login do Vendedor</h1>
+          <h1 class="display-4 fw-bolder">Login do Cliente</h1>
           <span style="visibility: hidden;">-</span>
       </div>
   </div>
@@ -14,8 +12,11 @@
 <div class="container col-xl-10 col-xxl-8 px-4 py-5">
     <div class="row align-items-center g-lg-5 py-5">
         <div class="col-md-10 mx-auto col-lg-6">
-            <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" action="{% url 'vendor_login' %}" method="post">
+            <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" action="{% url 'customer_login' %}" method="post">
                 {% csrf_token %}
+                <!-- <div class="d-flex justify-content-center mb-5">
+                    <img src="{% static 'img/AGRO4.png' %}" alt="" style="width: 200px;">
+                </div> -->
     
                 {% csrf_token %}
                 {{ form.as_p }}
@@ -26,7 +27,7 @@
 
               <button class="w-100 btn btn-lg btn-success" type="submit">Logar</button>
               <hr class="my-4">
-              <small class="text-body-secondary">Ainda não possui conta?<a href="{% url 'vendor_register' %}"> Criar conta.</a></small>
+              <small class="text-body-secondary">Ainda não possui conta?<a href="{% url 'customer_register' %}"> Criar conta.</a></small>
             </form>
           </div>
       <div class="col-lg-6 text-center text-lg-start">

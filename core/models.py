@@ -4,7 +4,7 @@ from shortuuid.django_fields import ShortUUIDField
 from django.utils.timezone import now
 
 from accounts.models import CustomUser
-from .permissions import VENDOR_PERMISSIONS
+from .permissions import VENDOR_PERMISSIONS, CUSTOMER_PERMISSIONS
 
 
 def user_directory_path(instance, filename):
@@ -30,22 +30,24 @@ STATUS_CHOICES = (
     ('entregue', 'Entregue'),
 )
 
-# class Customer(models.Model):
-#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='customer')
+class Customer(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='customer')
 
-#     image = models.ImageField(upload_to=user_directory_path, default='customer.jpg')
-#     cpf = models.CharField('CPF', max_length=11, null=True, blank=True)
+    image = models.ImageField(upload_to=user_directory_path, default='customer.jpg')
+    cpf = models.CharField('CPF', max_length=11, null=True, blank=True)
 
-#     class Meta:
-#         verbose_name = 'Cliente'
-#         verbose_name_plural = 'Clientes'
+    class Meta:
+        verbose_name = 'Cliente'
+        verbose_name_plural = 'Clientes'
+
+        permissions = CUSTOMER_PERMISSIONS
 
 
-#     def customer_image(self):
-#         return mark_safe(f'<img src="{self.image.url}" width="50" height="50" />')
+    def customer_image(self):
+        return mark_safe(f'<img src="{self.image.url}" width="50" height="50" />')
     
-#     def __str__(self):
-#         return self.user
+    def __str__(self):
+        return self.user.username
     
 
 class Vendor(models.Model):
@@ -60,8 +62,8 @@ class Vendor(models.Model):
     
     
     class Meta:
-        verbose_name = 'Fornecedor'
-        verbose_name_plural = 'Fornecedores'
+        verbose_name = 'Vendedor'
+        verbose_name_plural = 'Vendedores'
 
         permissions = VENDOR_PERMISSIONS 
 

@@ -42,7 +42,7 @@ def category_product_list_view(request, id):
 
 
 def product_list_view(request):
-    products = models.Product.objects.filter(product_status='publicado')
+    products = models.Product.objects.filter(product_status='publicado').order_by('-id')
     
     context = {
         'products': products,
@@ -171,7 +171,7 @@ def delete_item_from_cart(request):
     })
 
 
-@login_required(redirect_field_name="vendor_login", login_url='vendor_login')
+@login_required(redirect_field_name="customer_login", login_url='customer_login')
 def checkout_view(request):
     host = request.get_host()
     if request.method == 'POST':
@@ -237,5 +237,15 @@ def payment_success_view(request):
     context = request.GET
     return render(request, 'core/payment_success.html', {'context': context})
 
+
 def payment_failed_view(request):
     return render(request, 'core/payment_failed.html')
+
+
+def vendor_list_view(request):
+    vendors = models.Vendor.objects.all()
+
+    context = {
+        'vendors': vendors,
+    }
+    return render(request, 'core/vendor_list.html', context)

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    contact-card {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .contact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .social-icon {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .social-icon:hover {
+        transform: scale(1.2);
+    }
+</style>
+{% endblock head %}
+{% block content %}
+<header class="bg-success py-5">
+    <div class="container px-4 px-lg-5 my-5 position-relative" style="height: 200px;">
+        <div class="text-start text-white row g-3 align-items-center position-absolute bottom-0 start-0">
+            <h1 class="display-4 fw-bolder">Feirantes</h1>
+            <span>Total de feirantes cadastrados - {{ vendors|length }}</span>
+        </div>
+    </div>
+</header>
+<div class="container">
+    {% if vendors %}
+    <div class="row justify-content-center row-gap-3 my-5">
+        {% for vendor in vendors %}
+        <div class="col-lg-6">
+            <div class="contact-card bg-white rounded-4 shadow-sm overflow-hidden">
+                <div class="row g-0">
+                    <!-- <div class="col-md-4 bg-success bg-gradient d-flex align-items-center justify-content-center p-4">
+                        <img src="{{ vendor.image.url }}" class="rounded-circle shadow-sm w-100"
+                            alt="Profile Image" style="object-fit: contain;">
+                    </div> -->
+                    <div class="col-md-4 bg-success bg-gradient d-flex align-items-center justify-content-center p-4">
+                        <div class="rounded-circle shadow-sm overflow-hidden" 
+                             style="width: 90px; height: 90px;">
+                            <img src="{{ vendor.image.url }}" alt="Profile Image"
+                                 class="w-100 h-100"
+                                 style="object-fit: cover;">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="card-title mb-0 text-success fw-bold">{{ vendor.user.username|title }}</h3>
+                                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">
+                                    Feirante
+                                </span>
+                            </div>
+                            <p class="card-text text-muted mb-4">
+                                {{ vendor.description }}
+                            </p>
+                            <div class="d-flex gap-3 mb-4">
+                                <!-- <button class="btn btn-success px-4 rounded-pill">
+                                    <i class="fas fa-envelope me-2"></i>Contact
+                                </button> -->
+                                <button class="btn btn-outline-success px-4 rounded-pill">
+                                    <i class="bi bi-eye-fill"></i> Ver mais
+                                </button>
+                            </div>
+                            <div class="border-top pt-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small">
+                                        <i class="bi bi-geo-alt-fill"></i> {{ vendor.user.address.first.address|default:"Endereço não disponível" }}, {{ vendor.user.address.first.city|default:"" }} - {{ vendor.user.address.first.state|default:"" }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {% endfor %}
+    </div>
+    {% else %}
+    {% endif %}
+</div>
+{% endblock content %}

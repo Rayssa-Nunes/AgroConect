@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 
-from core.models import Vendor, Order, Product, Category
+from core.models import Vendor, Customer
 from core.utils import add_permission
 from core.forms import  VendorDetailsForm, AddressForm
 
@@ -54,8 +54,11 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.save()
         messages.success(request, 'Conta ativada com sucesso! Você pode fazer login agora.')
-        if hasattr(user, 'vendor'):
+        if hasattr(user, 'vendor') and user.has_perm('core.view_vendor_dashboard'):
+            print('VENDOR')
             return redirect('vendor_login')
+        elif hasattr(user, 'customer') and user.has_perm('core.view_customer_dashboard'):
+            return redirect('customer_login')
     else:
         messages.error(request, 'O link de ativação é inválido.')
         return redirect('home')
@@ -124,8 +127,8 @@ def vendor_login_view(request):
 
                     return redirect('vendor_dashboard')
                 else:
-                    messages.error(request, 'Você não tem acesso a esta página.')
-                    return redirect('home')
+                    messages.error(request, 'Você não tem acesso a esta página. Registre-se.')
+                    return redirect('vendor_register')
             else:
                 messages.error(request, 'Credenciais inválidas. Tente novamente.')
     else:
@@ -136,3 +139,54 @@ def vendor_login_view(request):
 def logout_user(request):
     logout(request)
     return redirect('home') 
+
+
+def customer_register_view(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+
+            Customer.objects.create(user=user)
+            add_permission(user, Customer, 'view_customer_dashboard')
+
+            activateEmail(request, user, form.cleaned_data.get('email'))
+            return redirect('/')
+        else:
+            # messages.error(request, 'Verifique os erros abaixo.')
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+    else:
+        form = RegisterForm()
+
+    return render(request, 'accounts/customer_register.html', {'form': form})
+                            
+
+def customer_login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request, request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                if user.has_perm('core.view_customer_dashboard') and user.is_active:
+                    auth_login(request, user)
+                
+                    if 'cart' in request.session:
+                        Cart(request)._save_cart_to_db()
+
+                    return redirect('home')
+                else:
+                    messages.error(request, 'Você não tem acesso. Registre-se.')
+                    # return redirect('customer_register')
+            else:
+                messages.error(request, 'Credenciais inválidas. Tente novamente.')
+    else:
+        form = LoginForm()
+    return render(request, 'accounts/customer_login.html', {'form': form})
+

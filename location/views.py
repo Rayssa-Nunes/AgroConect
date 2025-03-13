@@ -66,7 +66,7 @@ def fair_view(request):
 
 
 @login_required
-def fair_list(request):
+def my_fair_list(request):
     user = request.user
     user_fairs = user.fairs.all()
 
@@ -92,61 +92,8 @@ def leave_fair(request, id):
     else:
         messages.error(request, "Você não está registrado nesta feira.")
 
-    return redirect('fair_list')
+    return redirect('my_fair_list')
 
-
-
-coordinates = [
-    {'gramado': {'latitude': '-29.386051225274144', 'longitude': '-50.89690380192829'}},
-    {'arara': {'latitude': '-6.845475646209959', 'longitude': '-35.7725301195203'}},
-    {'bananeiras': {'latitude': '-6.7537682', 'longitude': '-35.6338343'}},
-    {'solanea': {'latitude': '-6.7540351', 'longitude': '-35.6621943'}}
-]
-
-
-# def map_view(request):
-#     loc = Location()
-#     coords = loc.get_distinct_cep_locations()
-
-#     mapa = folium.Map(location=[coords[0]['latitude'], coords[0]['longitude']], zoom_start=7)
-
-#     if request.method == 'POST':
-#         cep = request.POST.get('cep')
-#         if cep:
-#             coord = loc.get_location(cep)
-
-#             if coord:
-#                 distances = loc.calculate_distance(coord, coords)
-#                 location = (float(coord['latitude']), float(coord['longitude']))
-#                 mapa = folium.Map(location=location)
-
-#                 folium.Marker(location=location, popup=coord['city'], icon=folium.Icon(color='red')).add_to(mapa)
-                
-#                 for dist in distances:
-#                     for cep, distance_value in dist.items():
-#                         cep_coords = next((item for item in coords if item['cep'] == cep), None)
-#                         if cep_coords:
-#                             cep_location = (float(cep_coords['latitude']), float(cep_coords['longitude']))
-#                             folium.Marker(location=cep_location, popup=f'{cep}: {distance_value:.2f} km').add_to(mapa)
-
-#                 ceps = [item['cep'] for item in coords]
-#                 fairs = Fair.objects.filter(address__cep__in=ceps)
-#     else:
-    
-#         for location in coords:
-#             folium.Marker(
-#                 location=[location['latitude'], location['longitude']],
-#                 popup=f"Cidade: {location['city']}, CEP: {location['cep']}"
-#             ).add_to(mapa)
-
-#     mapa_html = mapa._repr_html_()
-
-#     context = {
-#         'locations': coords,
-#         'mapa_html': mapa_html,
-#         'fairs': fairs if request.method == 'POST' and cep else None,
-#     }
-#     return render(request, 'location/map.html', context)
 
 def map_view(request):
     loc = Location()
@@ -172,9 +119,12 @@ def map_view(request):
                     if cep_coords:
                         cep_location = (float(cep_coords['latitude']), float(cep_coords['longitude']))
                         folium.Marker(location=cep_location, popup=f'{cep}: {distance_value:.2f} km').add_to(mapa)
+ 
 
-            ceps = [item['cep'] for item in coords]
-            fairs = Fair.objects.filter(address__cep__in=ceps)
+            ordered_ceps = [next(iter(d)) for d in distances]
+            fairs = list(Fair.objects.filter(address__cep__in=ordered_ceps))
+            fairs.sort(key=lambda fair: ordered_ceps.index(fair.address.cep))
+            
             mapa_html = mapa._repr_html_()
     else:
         mapa = folium.Map(location=[coords[0]['latitude'], coords[0]['longitude']], zoom_start=7)
@@ -193,3 +143,13 @@ def map_view(request):
         'distances': distances,
     }
     return render(request, 'location/map.html', context)
+
+
+def fair_list(request):
+    fairs = Fair.objects.all()
+
+    context = {
+        'fairs': fairs,
+    }
+
+    return render(request, 'location/fair_list.html', context)
